@@ -1,0 +1,227 @@
+// Prisma schema — defines every database table and their relationships.
+// Run `npx prisma migrate dev` to apply this to your database.
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ─── USER ────────────────────────────────────────────────────────────────────
+model User {
+  id            String    @id @default(cuid())
+  name          String?
+  email         String    @unique
+  emailVerified DateTime?
+  password      String?   // hashed with bcrypt
+  image         String?
+  role          Role      @default(USER)
+  language      String    @default("en") // preferred language: "en" or "he"
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  // Relations
+  accounts  Account[]
+  sessions  Session[]
+  orders    Order[]
+  cart      Cart?
+  wishlist  Wishlist[]
+  reviews   Review[]
+
+  @@map("users")
+}
+
+enum Role {
+  USER
+  ADMIN
+}
+
+// ─── NEXTAUTH TABLES ─────────────────────────────────────────────────────────
+model Account {
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String? @db.Text
+  access_token      String? @db.Text
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String? @db.Text
+  session_state     String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+  @@map("accounts")
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("sessions")
+}
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
+  @@map("verification_tokens")
+}
+
+// ─── CATEGORY ────────────────────────────────────────────────────────────────
+model Category {
+  id          String  @id @default(cuid())
+  name        String  @unique      // English name
+  nameHe      String?              // Hebrew name
+  slug        String  @unique      // URL-friendly: "programming", "fiction"
+  description String?
+  image       String?
+
+  books Book[]
+
+  @@map("categories")
+}
+
+// ─── BOOK ─────────────────────────────────────────────────────────────────────
+model Book {
+  id            String   @id @default(cuid())
+  title         String
+  titleHe       String?             // Hebrew title
+  author        String
+  authorHe      String?             // Hebrew author name
+  description   String   @db.Text
+  descriptionHe String?  @db.Text
+  price         Float                // regular price in USD
+  discountPrice Float?               // sale price (null = no discount)
+  priceILS      Float?               // price in Israeli Shekel (₪) shown when language = Hebrew
+  coverImage    String?              // URL of the book cover
+  isbn          String?  @unique
+  language      String   @default("en")  // "en" or "he"
+  stock         Int      @default(0)     // inventory count
+  rating        Float    @default(0)     // cached average rating (0-5)
+  reviewCount   Int      @default(0)     // cached count
+  featured      Boolean  @default(false) // shown on homepage
+  published     Boolean  @default(true)  // hide without deleting
+  pages         Int?
+  publisher     String?
+  publishedAt   DateTime?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  // Relations
+  categoryId String
+  category   Category @relation(fields: [categoryId], references: [id])
+
+  cartItems  CartItem[]
+  orderItems OrderItem[]
+  wishlists  Wishlist[]
+  reviews    Review[]
+
+  @@map("books")
+}
+
+// ─── CART ─────────────────────────────────────────────────────────────────────
+model Cart {
+  id        String     @id @default(cuid())
+  userId    String     @unique
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+
+  user  User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  items CartItem[]
+
+  @@map("carts")
+}
+
+model CartItem {
+  id       String @id @default(cuid())
+  cartId   String
+  bookId   String
+  quantity Int    @default(1)
+
+  cart Cart @relation(fields: [cartId], references: [id], onDelete: Cascade)
+  book Book @relation(fields: [bookId], references: [id])
+
+  @@unique([cartId, bookId])
+  @@map("cart_items")
+}
+
+// ─── ORDER ────────────────────────────────────────────────────────────────────
+model Order {
+  id              String      @id @default(cuid())
+  userId          String
+  status          OrderStatus @default(PENDING)
+  total           Float
+  stripePaymentId String?     // Stripe PaymentIntent id
+  shippingAddress Json?       // stored as JSON object
+  createdAt       DateTime    @default(now())
+  updatedAt       DateTime    @updatedAt
+
+  user  User        @relation(fields: [userId], references: [id])
+  items OrderItem[]
+
+  @@map("orders")
+}
+
+enum OrderStatus {
+  PENDING
+  PAID
+  SHIPPED
+  DELIVERED
+  CANCELLED
+}
+
+model OrderItem {
+  id       String @id @default(cuid())
+  orderId  String
+  bookId   String
+  quantity Int
+  price    Float  // price at time of purchase (snapshot)
+
+  order Order @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  book  Book  @relation(fields: [bookId], references: [id])
+
+  @@map("order_items")
+}
+
+// ─── WISHLIST ─────────────────────────────────────────────────────────────────
+model Wishlist {
+  id        String   @id @default(cuid())
+  userId    String
+  bookId    String
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  book Book @relation(fields: [bookId], references: [id])
+
+  @@unique([userId, bookId])
+  @@map("wishlists")
+}
+
+// ─── REVIEW ───────────────────────────────────────────────────────────────────
+model Review {
+  id        String   @id @default(cuid())
+  userId    String
+  bookId    String
+  rating    Int      // 1-5
+  comment   String?  @db.Text
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  book Book @relation(fields: [bookId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, bookId]) // one review per user per book
+  @@map("reviews")
+}
