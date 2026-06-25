@@ -26,7 +26,7 @@ export interface Book {
   description: string;
   featured?: boolean;
   bestseller?: boolean;
-  stock?: number;
+  stock: number;
   discountPrice?: number | null;
 }
 

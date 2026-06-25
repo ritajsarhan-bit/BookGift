@@ -12,7 +12,7 @@ export function BookActions({ book }: { book: Book }) {
   const [added, setAdded] = useState(false);
 
   function handleAdd() {
-    addItem({ id: book.id, title: book.title, author: book.author, price: book.price, discountPrice: book.discountPrice, coverImage: book.coverImage, stock: book.stock ?? 0 });
+    addItem({ id: book.id, title: book.title, author: book.author, price: book.price, discountPrice: book.discountPrice, coverImage: book.coverImage, stock: book.stock });
     if (qty > 1) updateQuantity(book.id, qty);
     setAdded(true);
     setTimeout(() => setAdded(false), 1800);
