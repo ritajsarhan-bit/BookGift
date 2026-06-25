@@ -1,7 +1,32 @@
+import { signIn } from 'next-auth/react';
 import { NextAuthOptions } from 'next-auth';
 import CredentialsProvider from 'next-auth/providers/credentials';
 import { prisma } from '@/lib/prisma';
 import bcrypt from 'bcryptjs';
+
+export async function signInWithEmail(email: string, password: string) {
+  const result = await signIn('credentials', { email, password, redirect: false });
+  if (result?.error) return { ok: false as const, error: 'Invalid email or password.' };
+  return { ok: true as const, error: null };
+}
+
+export async function signUpWithEmail(email: string, password: string, name: string) {
+  const res = await fetch('/api/auth/register', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ email, password, name }),
+  });
+  if (!res.ok) {
+    const data = await res.json().catch(() => ({}));
+    return { ok: false as const, error: data.error || 'Registration failed.' };
+  }
+  return signInWithEmail(email, password);
+}
+
+export async function signInWithGoogle() {
+  await signIn('google', { redirect: false });
+  return { ok: true as const, error: null };
+}
 
 export const authOptions: NextAuthOptions = {
   session: { strategy: 'jwt' },
