@@ -1,0 +1,41 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  color-scheme: light;
+}
+
+@layer base {
+  body {
+    @apply bg-paper text-ink antialiased;
+    font-feature-settings: "kern", "liga";
+  }
+
+  ::selection {
+    @apply bg-brand-200 text-brand-900;
+  }
+}
+
+@layer utilities {
+  .line-clamp-2 {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+  .line-clamp-3 {
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+}
+
+/* Subtle paper texture accent for hero sections */
+.bg-hero-gradient {
+  background:
+    radial-gradient(120% 120% at 80% 0%, rgba(194, 65, 12, 0.08) 0%, transparent 50%),
+    radial-gradient(100% 100% at 0% 100%, rgba(142, 45, 82, 0.06) 0%, transparent 45%),
+    #faf7f2;
+}
