@@ -28,6 +28,7 @@ export const books: Book[] = [
       "Between life and death there is a library, and within it, infinite books offering the chance to try another life. A luminous novel about regret, hope, and the lives we could have lived.",
     featured: true,
     bestseller: true,
+    stock: 10,
   },
   {
     id: "2",
@@ -46,6 +47,7 @@ export const books: Book[] = [
       "An easy and proven way to build good habits and break bad ones. Tiny changes, remarkable results — a practical framework for improving every day.",
     featured: true,
     bestseller: true,
+    stock: 10,
   },
   {
     id: "3",
@@ -63,6 +65,7 @@ export const books: Book[] = [
     description:
       "A painfully beautiful coming-of-age story and a surprising tale of possible murder, set against the marshes of the North Carolina coast.",
     featured: true,
+    stock: 10,
   },
   {
     id: "4",
@@ -80,6 +83,7 @@ export const books: Book[] = [
     description:
       "A tale of gods, kings, immortal fame, and the human heart. Madeline Miller reimagines Homer's Iliad through a luminous love story.",
     bestseller: true,
+    stock: 10,
   },
   {
     id: "5",
@@ -97,6 +101,7 @@ export const books: Book[] = [
     description:
       "From the Stone Age to the Silicon Age, a sweeping exploration of how Homo sapiens came to rule the world.",
     featured: true,
+    stock: 10,
   },
   {
     id: "6",
@@ -113,6 +118,7 @@ export const books: Book[] = [
     language: "English",
     description:
       "A beloved picture book following one very hungry caterpillar as it eats its way to a beautiful transformation. A perfect first gift.",
+    stock: 10,
   },
   {
     id: "7",
@@ -129,6 +135,7 @@ export const books: Book[] = [
     language: "English",
     description:
       "A collection of poetry and prose about survival, the experience of violence, abuse, love, loss, and femininity.",
+    stock: 10,
   },
   {
     id: "8",
@@ -146,6 +153,7 @@ export const books: Book[] = [
     description:
       "An intimate, powerful, and inspiring memoir by the former First Lady of the United States.",
     bestseller: true,
+    stock: 10,
   },
   {
     id: "9",
@@ -163,6 +171,7 @@ export const books: Book[] = [
     description:
       "A lone astronaut must save the earth from disaster in this cinematic, science-packed thriller from the author of The Martian.",
     featured: true,
+    stock: 10,
   },
   {
     id: "10",
@@ -180,6 +189,7 @@ export const books: Book[] = [
     description:
       "Aging Hollywood icon Evelyn Hugo finally tells the truth about her glamorous and scandalous life — and the seven marriages along the way.",
     bestseller: true,
+    stock: 10,
   },
   {
     id: "11",
@@ -196,6 +206,7 @@ export const books: Book[] = [
     language: "English",
     description:
       "A memoir about a young woman who, kept out of school, leaves her survivalist family and goes on to earn a PhD from Cambridge University.",
+    stock: 10,
   },
   {
     id: "12",
@@ -212,6 +223,7 @@ export const books: Book[] = [
     language: "English",
     description:
       "Bilbo Baggins is swept into an epic quest to reclaim a treasure guarded by a dragon. The timeless prelude to The Lord of the Rings.",
+    stock: 10,
   },
 ];
 

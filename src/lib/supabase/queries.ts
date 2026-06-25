@@ -39,6 +39,7 @@ export function mapBookRow(row: BookRow): Book {
     publishedYear: new Date(row.created_at).getFullYear(),
     language: row.language,
     description: row.description ?? "",
+    stock: 10,
   };
 }
 

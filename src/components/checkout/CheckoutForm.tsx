@@ -11,7 +11,7 @@ type PayMethod = "card" | "paypal";
 
 export function CheckoutForm() {
   const router = useRouter();
-  const { items, clear } = useCart();
+  const { items, clearCart: clear } = useCart();
   const [method, setMethod] = useState<PayMethod>("card");
   const [placed, setPlaced] = useState(false);
 

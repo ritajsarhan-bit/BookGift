@@ -19,7 +19,7 @@ export function getSupabaseBrowserClient(): SupabaseClient<Database> | null {
   }
 
   if (!browserClient) {
-    browserClient = createBrowserClient<Database>(url, anonKey);
+    browserClient = createBrowserClient<Database>(url, anonKey) as any;
   }
   return browserClient;
 }

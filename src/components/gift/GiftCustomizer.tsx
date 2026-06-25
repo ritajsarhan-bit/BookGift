@@ -39,7 +39,7 @@ export function GiftCustomizer({ book }: { book: Book }) {
       giftBox,
       recipientName: recipientName.trim() || undefined,
     };
-    addItem(book, 1, gift);
+    addItem({ id: book.id, title: book.title, author: book.author, price: book.price, discountPrice: book.discountPrice, coverImage: book.coverImage, stock: book.stock });
     if (goToCart) router.push("/cart");
   }
 

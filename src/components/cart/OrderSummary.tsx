@@ -4,8 +4,16 @@ import type { ReactNode } from "react";
 import { useCart } from "@/context/CartContext";
 import { formatPrice } from "@/lib/utils";
 
+const FREE_SHIPPING_THRESHOLD = 50;
+const SHIPPING_COST = 4.99;
+
 export function OrderSummary({ children }: { children?: ReactNode }) {
-  const { subtotal, shipping, total, count, freeShippingThreshold } = useCart();
+  const { totalPrice, totalItems } = useCart();
+  const subtotal = totalPrice;
+  const count = totalItems;
+  const shipping = subtotal >= FREE_SHIPPING_THRESHOLD ? 0 : SHIPPING_COST;
+  const total = subtotal + shipping;
+  const freeShippingThreshold = FREE_SHIPPING_THRESHOLD;
 
   const remaining = Math.max(0, freeShippingThreshold - subtotal);
   const progress = Math.min(100, (subtotal / freeShippingThreshold) * 100);
