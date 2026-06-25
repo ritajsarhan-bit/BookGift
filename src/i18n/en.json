@@ -1,0 +1,115 @@
+{
+  "nav": {
+    "home": "Home",
+    "books": "Books",
+    "categories": "Categories",
+    "cart": "Cart",
+    "login": "Login",
+    "logout": "Logout",
+    "register": "Register",
+    "profile": "My Profile",
+    "orders": "My Orders",
+    "wishlist": "Wishlist",
+    "admin": "Admin"
+  },
+  "home": {
+    "hero_title": "Discover Your Next Favorite Book",
+    "hero_subtitle": "Browse thousands of books in English and Hebrew. Find programming guides, fiction, science, and more.",
+    "hero_cta": "Shop Now",
+    "featured_title": "Featured Books",
+    "categories_title": "Browse by Category",
+    "search_placeholder": "Search books, authors, ISBN..."
+  },
+  "book": {
+    "add_to_cart": "Add to Cart",
+    "add_to_wishlist": "Add to Wishlist",
+    "remove_from_wishlist": "Remove from Wishlist",
+    "in_stock": "In Stock",
+    "out_of_stock": "Out of Stock",
+    "reviews": "Reviews",
+    "related_books": "Related Books",
+    "pages": "pages",
+    "language": "Language",
+    "publisher": "Publisher",
+    "description": "Description",
+    "write_review": "Write a Review",
+    "no_reviews": "No reviews yet. Be the first!"
+  },
+  "cart": {
+    "title": "Your Cart",
+    "empty": "Your cart is empty",
+    "empty_cta": "Browse Books",
+    "total": "Total",
+    "checkout": "Proceed to Checkout",
+    "remove": "Remove",
+    "quantity": "Quantity",
+    "subtotal": "Subtotal"
+  },
+  "checkout": {
+    "title": "Checkout",
+    "shipping": "Shipping Address",
+    "payment": "Payment",
+    "place_order": "Place Order",
+    "order_summary": "Order Summary",
+    "full_name": "Full Name",
+    "address": "Address",
+    "city": "City",
+    "country": "Country",
+    "zip": "ZIP Code"
+  },
+  "auth": {
+    "login_title": "Sign In",
+    "register_title": "Create Account",
+    "email": "Email",
+    "password": "Password",
+    "name": "Full Name",
+    "login_btn": "Sign In",
+    "register_btn": "Create Account",
+    "no_account": "Don't have an account?",
+    "have_account": "Already have an account?",
+    "sign_up": "Sign up",
+    "sign_in": "Sign in"
+  },
+  "chatbot": {
+    "title": "Book Assistant",
+    "placeholder": "Ask me anything about books...",
+    "send": "Send",
+    "greeting": "Hi! I'm your book assistant. Ask me to recommend books, check availability, or help you find your next read!"
+  },
+  "filters": {
+    "title": "Filters",
+    "category": "Category",
+    "language": "Language",
+    "price_range": "Price Range",
+    "all_categories": "All Categories",
+    "all_languages": "All Languages",
+    "english": "English",
+    "hebrew": "Hebrew",
+    "clear": "Clear Filters",
+    "sort_by": "Sort By",
+    "sort_newest": "Newest",
+    "sort_price_asc": "Price: Low to High",
+    "sort_price_desc": "Price: High to Low",
+    "sort_rating": "Top Rated"
+  },
+  "admin": {
+    "dashboard": "Dashboard",
+    "books": "Books",
+    "orders": "Orders",
+    "users": "Users",
+    "categories": "Categories",
+    "add_book": "Add Book",
+    "edit_book": "Edit Book",
+    "delete_book": "Delete Book",
+    "total_orders": "Total Orders",
+    "total_users": "Total Users",
+    "total_books": "Total Books",
+    "revenue": "Revenue"
+  },
+  "errors": {
+    "not_found": "Page Not Found",
+    "not_found_desc": "The page you are looking for doesn't exist.",
+    "go_home": "Go Home",
+    "generic": "Something went wrong. Please try again."
+  }
+}
