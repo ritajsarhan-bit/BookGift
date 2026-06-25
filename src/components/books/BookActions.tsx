@@ -7,12 +7,13 @@ import { Button } from "@/components/ui/Button";
 import { useCart } from "@/context/CartContext";
 
 export function BookActions({ book }: { book: Book }) {
-  const { addItem } = useCart();
+  const { addItem, updateQuantity } = useCart();
   const [qty, setQty] = useState(1);
   const [added, setAdded] = useState(false);
 
   function handleAdd() {
-    addItem(book, qty);
+    addItem(book);
+    if (qty > 1) updateQuantity(book.id, qty);
     setAdded(true);
     setTimeout(() => setAdded(false), 1800);
   }
