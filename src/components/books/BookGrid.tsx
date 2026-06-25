@@ -1,5 +1,5 @@
 import type { Book } from "@/lib/types";
-import { BookCard } from "./BookCard";
+import BookCard from "./BookCard";
 
 export function BookGrid({ books }: { books: Book[] }) {
   if (books.length === 0) {
