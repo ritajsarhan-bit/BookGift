@@ -112,6 +112,11 @@ export function CartProvider({ children }: { children: ReactNode }) {
   );
 }
 
+export function lineTotal(item: CartItem): number {
+  const unitPrice = item.book.discountPrice ?? item.book.price;
+  return unitPrice * item.quantity;
+}
+
 export function useCart() {
   return useContext(CartContext);
 }
