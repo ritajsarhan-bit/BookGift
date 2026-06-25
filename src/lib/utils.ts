@@ -18,3 +18,12 @@ export function formatPrice(amount: number): string {
 export function makeId(prefix = "ln"): string {
   return `${prefix}_${Math.random().toString(36).slice(2, 9)}`;
 }
+
+/** Turn a title into a URL-friendly slug (e.g. "The Hobbit" -> "the-hobbit"). */
+export function slugify(text: string): string {
+  return text
+    .toLowerCase()
+    .trim()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "");
+}

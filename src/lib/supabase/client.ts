@@ -1,25 +1,25 @@
-// Browser-side Supabase client scaffold.
+// Browser-side Supabase client (App Router / client components).
 //
-// NOTE: The database is intentionally NOT connected yet. This module only
-// constructs a client when env vars are present so the rest of the app can
-// import it without crashing. Swap mock data in src/lib/data for real queries
-// once the Supabase project is provisioned.
+// Built on @supabase/ssr so the auth session is stored in cookies and shared
+// with the server. Returns null when env vars are absent so the rest of the app
+// can fall back to mock data without crashing in a fresh checkout.
 
-import { createClient, type SupabaseClient } from "@supabase/supabase-js";
+import { createBrowserClient } from "@supabase/ssr";
+import type { SupabaseClient } from "@supabase/supabase-js";
+import type { Database } from "./database.types";
+import { getSupabaseEnv } from "./env";
 
-let browserClient: SupabaseClient | null = null;
+let browserClient: SupabaseClient<Database> | null = null;
 
-export function getSupabaseBrowserClient(): SupabaseClient | null {
-  const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
-  const anonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
-
+export function getSupabaseBrowserClient(): SupabaseClient<Database> | null {
+  const { url, anonKey } = getSupabaseEnv();
   if (!url || !anonKey) {
     // Not configured yet — features relying on this should fall back to mocks.
     return null;
   }
 
   if (!browserClient) {
-    browserClient = createClient(url, anonKey);
+    browserClient = createBrowserClient<Database>(url, anonKey);
   }
   return browserClient;
 }

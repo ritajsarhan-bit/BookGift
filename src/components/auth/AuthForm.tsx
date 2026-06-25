@@ -2,19 +2,51 @@
 
 import { useState, type FormEvent } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { Input } from "@/components/ui/Input";
 import { Button } from "@/components/ui/Button";
+import {
+  signInWithEmail,
+  signUpWithEmail,
+  signInWithGoogle,
+} from "@/lib/auth";
 
 type Mode = "login" | "signup";
 
 export function AuthForm({ mode }: { mode: Mode }) {
   const isLogin = mode === "login";
-  const [notice, setNotice] = useState(false);
+  const router = useRouter();
+  const [notice, setNotice] = useState<string | null>(null);
+  const [loading, setLoading] = useState(false);
 
-  function handleSubmit(e: FormEvent) {
+  async function handleSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
-    // Auth is not wired up yet (no Supabase connection).
-    setNotice(true);
+    setNotice(null);
+    setLoading(true);
+
+    const form = new FormData(e.currentTarget);
+    const email = String(form.get("email") ?? "");
+    const password = String(form.get("password") ?? "");
+    const fullName = String(form.get("name") ?? "");
+
+    const result = isLogin
+      ? await signInWithEmail(email, password)
+      : await signUpWithEmail(email, password, fullName);
+
+    setLoading(false);
+
+    if (result.ok) {
+      router.push("/");
+      router.refresh();
+    } else {
+      setNotice(result.error);
+    }
+  }
+
+  async function handleGoogle() {
+    setNotice(null);
+    const result = await signInWithGoogle();
+    if (!result.ok) setNotice(result.error);
   }
 
   return (
@@ -33,8 +65,7 @@ export function AuthForm({ mode }: { mode: Mode }) {
 
         {notice && (
           <div className="mb-5 rounded-xl bg-cream/80 p-3 text-center text-sm text-ink-soft">
-            🔌 Authentication isn't connected yet. This is a UI placeholder —
-            Supabase Auth will power this later.
+            {notice}
           </div>
         )}
 
@@ -42,7 +73,7 @@ export function AuthForm({ mode }: { mode: Mode }) {
         <div className="space-y-2.5">
           <button
             type="button"
-            onClick={() => setNotice(true)}
+            onClick={handleGoogle}
             className="flex w-full items-center justify-center gap-2 rounded-full border border-ink/15 bg-white px-4 py-2.5 text-sm font-medium text-ink transition-colors hover:bg-ink/5"
           >
             <span className="text-base">G</span> Continue with Google
@@ -57,10 +88,17 @@ export function AuthForm({ mode }: { mode: Mode }) {
 
         <form onSubmit={handleSubmit} className="space-y-4">
           {!isLogin && (
-            <Input id="name" label="Full name" placeholder="Jane Reader" required />
+            <Input
+              id="name"
+              name="name"
+              label="Full name"
+              placeholder="Jane Reader"
+              required
+            />
           )}
           <Input
             id="email"
+            name="email"
             type="email"
             label="Email"
             placeholder="you@example.com"
@@ -68,6 +106,7 @@ export function AuthForm({ mode }: { mode: Mode }) {
           />
           <Input
             id="password"
+            name="password"
             type="password"
             label="Password"
             placeholder="••••••••"
@@ -82,8 +121,12 @@ export function AuthForm({ mode }: { mode: Mode }) {
             </div>
           )}
 
-          <Button type="submit" className="w-full">
-            {isLogin ? "Sign in" : "Create account"}
+          <Button type="submit" className="w-full" disabled={loading}>
+            {loading
+              ? "Please wait…"
+              : isLogin
+                ? "Sign in"
+                : "Create account"}
           </Button>
         </form>
 
