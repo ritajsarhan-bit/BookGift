@@ -1,80 +1,69 @@
-import Link from "next/link";
-import { Container } from "@/components/ui/Container";
+'use client';
 
-const columns = [
-  {
-    title: "Shop",
-    links: [
-      { href: "/books", label: "All Books" },
-      { href: "/books?category=Fiction", label: "Fiction" },
-      { href: "/books?category=Children", label: "Children" },
-      { href: "/gift", label: "Gift Wrapping" },
-    ],
-  },
-  {
-    title: "Account",
-    links: [
-      { href: "/login", label: "Sign In" },
-      { href: "/signup", label: "Create Account" },
-      { href: "/cart", label: "Cart" },
-      { href: "/admin", label: "Admin" },
-    ],
-  },
-  {
-    title: "Company",
-    links: [
-      { href: "#", label: "About" },
-      { href: "#", label: "Contact" },
-      { href: "#", label: "Privacy" },
-      { href: "#", label: "Terms" },
-    ],
-  },
-];
+import Link from 'next/link';
+import { useLanguage } from '@/context/LanguageContext';
 
-export function Footer() {
+export default function Footer() {
+  const { language, setLanguage } = useLanguage();
+
   return (
-    <footer className="mt-20 border-t border-ink/8 bg-cream/60">
-      <Container className="py-12">
-        <div className="grid gap-10 md:grid-cols-[1.4fr_repeat(3,1fr)]">
-          <div className="space-y-3">
-            <Link href="/" className="flex items-center gap-2">
-              <span className="grid h-9 w-9 place-items-center rounded-xl bg-brand-500 text-paper font-serif font-bold">
-                B
-              </span>
-              <span className="font-serif text-xl font-semibold text-ink">
-                Book<span className="text-brand-500">Gift</span>
-              </span>
-            </Link>
-            <p className="max-w-xs text-sm text-ink-soft">
-              Hand-picked books, beautifully wrapped. Give a story worth
-              remembering.
+    <footer className="bg-gray-900 text-gray-300 pt-12 pb-6 mt-16">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 mb-8">
+          {/* Brand */}
+          <div>
+            <h3 className="text-white font-bold text-xl mb-3">📚 BookStore</h3>
+            <p className="text-sm text-gray-400 leading-relaxed">
+              Your online destination for books in English and Hebrew.
             </p>
           </div>
 
-          {columns.map((col) => (
-            <div key={col.title}>
-              <h4 className="text-sm font-semibold text-ink">{col.title}</h4>
-              <ul className="mt-3 space-y-2">
-                {col.links.map((link) => (
-                  <li key={link.label}>
-                    <Link
-                      href={link.href}
-                      className="text-sm text-ink-soft transition-colors hover:text-brand-600"
-                    >
-                      {link.label}
-                    </Link>
-                  </li>
-                ))}
-              </ul>
+          {/* Links */}
+          <div>
+            <h4 className="text-white font-semibold mb-3">Shop</h4>
+            <ul className="space-y-2 text-sm">
+              <li><Link href="/books" className="hover:text-white transition-colors">All Books</Link></li>
+              <li><Link href="/books?lang=he" className="hover:text-white transition-colors">Hebrew Books</Link></li>
+              <li><Link href="/books?category=programming" className="hover:text-white transition-colors">Programming</Link></li>
+              <li><Link href="/books?category=fiction" className="hover:text-white transition-colors">Fiction</Link></li>
+            </ul>
+          </div>
+
+          {/* Account */}
+          <div>
+            <h4 className="text-white font-semibold mb-3">Account</h4>
+            <ul className="space-y-2 text-sm">
+              <li><Link href="/login" className="hover:text-white transition-colors">Sign In</Link></li>
+              <li><Link href="/register" className="hover:text-white transition-colors">Register</Link></li>
+              <li><Link href="/orders" className="hover:text-white transition-colors">My Orders</Link></li>
+              <li><Link href="/wishlist" className="hover:text-white transition-colors">Wishlist</Link></li>
+            </ul>
+          </div>
+
+          {/* Language */}
+          <div>
+            <h4 className="text-white font-semibold mb-3">Language / שפה</h4>
+            <div className="flex flex-col gap-2">
+              <button
+                onClick={() => setLanguage('en')}
+                className={`text-sm text-left px-3 py-2 rounded-lg transition-colors ${language === 'en' ? 'bg-blue-700 text-white' : 'hover:bg-gray-800'}`}
+              >
+                🇺🇸 English
+              </button>
+              <button
+                onClick={() => setLanguage('he')}
+                className={`text-sm text-left px-3 py-2 rounded-lg transition-colors ${language === 'he' ? 'bg-blue-700 text-white' : 'hover:bg-gray-800'}`}
+              >
+                🇮🇱 עברית
+              </button>
             </div>
-          ))}
+          </div>
         </div>
 
-        <div className="mt-10 flex flex-col items-center justify-between gap-3 border-t border-ink/8 pt-6 text-xs text-ink-muted sm:flex-row">
-          <p>© {new Date().getFullYear()} BookGift. All rights reserved.</p>
-          <p>Crafted with care · Demo build (no live database)</p>
+        <div className="border-t border-gray-800 pt-6 text-center text-xs text-gray-500">
+          © {new Date().getFullYear()} BookStore. All rights reserved. | Payments secured by Stripe.
         </div>
-      </Container>
+      </div>
     </footer>
   );
 }

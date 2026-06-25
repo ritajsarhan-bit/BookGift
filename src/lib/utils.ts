@@ -1,29 +1,25 @@
-import { clsx, type ClassValue } from "clsx";
-import { twMerge } from "tailwind-merge";
+import { clsx, type ClassValue } from 'clsx';
 
-/** Merge conditional class names and dedupe conflicting Tailwind classes. */
+/** Merge Tailwind classes safely */
 export function cn(...inputs: ClassValue[]) {
-  return twMerge(clsx(inputs));
+  return clsx(inputs);
 }
 
-/** Format a number as USD currency. */
-export function formatPrice(amount: number): string {
-  return new Intl.NumberFormat("en-US", {
-    style: "currency",
-    currency: "USD",
-  }).format(amount);
+/** Format a number as USD currency */
+export function formatPrice(price: number): string {
+  return new Intl.NumberFormat('en-US', {
+    style: 'currency',
+    currency: 'USD',
+  }).format(price);
 }
 
-/** Create a short, unique id for cart line items. */
-export function makeId(prefix = "ln"): string {
-  return `${prefix}_${Math.random().toString(36).slice(2, 9)}`;
+/** Truncate text to a maximum length */
+export function truncate(text: string, maxLength: number): string {
+  if (text.length <= maxLength) return text;
+  return text.slice(0, maxLength) + '…';
 }
 
-/** Turn a title into a URL-friendly slug (e.g. "The Hobbit" -> "the-hobbit"). */
-export function slugify(text: string): string {
-  return text
-    .toLowerCase()
-    .trim()
-    .replace(/[^a-z0-9]+/g, "-")
-    .replace(/^-+|-+$/g, "");
+/** Calculate discount percentage */
+export function discountPercent(original: number, discounted: number): number {
+  return Math.round(((original - discounted) / original) * 100);
 }

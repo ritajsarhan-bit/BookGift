@@ -1,61 +1,32 @@
-import { Container, SectionHeading } from "@/components/ui/Container";
-import { ButtonLink } from "@/components/ui/Button";
-import { BookGrid } from "@/components/books/BookGrid";
-import { Hero } from "@/components/home/Hero";
-import { CategoryStrip } from "@/components/home/CategoryStrip";
-import { GiftBanner } from "@/components/home/GiftBanner";
-import { getFeaturedBooks, getBestsellers } from "@/lib/data/books";
+/**
+ * Homepage — Hero, Featured Books, Categories
+ * This is a Server Component: data is fetched on the server, no loading spinner needed.
+ */
+import { prisma } from '@/lib/prisma';
+import HeroSection from '@/components/home/HeroSection';
+import FeaturedBooks from '@/components/home/FeaturedBooks';
+import CategoryGrid from '@/components/home/CategoryGrid';
 
-export default function HomePage() {
-  const featured = getFeaturedBooks();
-  const bestsellers = getBestsellers();
+export default async function HomePage() {
+  // Fetch featured books and categories in parallel on the server
+  const [featuredBooks, categories] = await Promise.all([
+    prisma.book.findMany({
+      where: { featured: true, published: true },
+      include: { category: true },
+      orderBy: { createdAt: 'desc' },
+      take: 8,
+    }),
+    prisma.category.findMany({
+      include: { _count: { select: { books: true } } },
+      orderBy: { name: 'asc' },
+    }),
+  ]);
 
   return (
     <>
-      <Hero />
-
-      <Container className="space-y-20 py-16">
-        {/* Categories */}
-        <section className="space-y-6">
-          <SectionHeading
-            eyebrow="Browse"
-            title="Shop by category"
-            subtitle="From bedtime classics to weekend page-turners."
-          />
-          <CategoryStrip />
-        </section>
-
-        {/* Featured */}
-        <section className="space-y-6">
-          <SectionHeading
-            eyebrow="Curated"
-            title="Featured this season"
-            action={
-              <ButtonLink href="/books" variant="outline" size="sm">
-                View all
-              </ButtonLink>
-            }
-          />
-          <BookGrid books={featured} />
-        </section>
-
-        {/* Gift banner */}
-        <GiftBanner />
-
-        {/* Bestsellers */}
-        <section className="space-y-6">
-          <SectionHeading
-            eyebrow="Loved by readers"
-            title="Bestsellers"
-            action={
-              <ButtonLink href="/books" variant="outline" size="sm">
-                View all
-              </ButtonLink>
-            }
-          />
-          <BookGrid books={bestsellers} />
-        </section>
-      </Container>
+      <HeroSection />
+      <FeaturedBooks books={featuredBooks} />
+      <CategoryGrid categories={categories} />
     </>
   );
 }

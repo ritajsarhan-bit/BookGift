@@ -1,164 +1,117 @@
-"use client";
+'use client';
 
-import {
-  createContext,
-  useContext,
-  useEffect,
-  useMemo,
-  useReducer,
-  type ReactNode,
-} from "react";
-import type { Book, CartItem, GiftOptions } from "@/lib/types";
-import { makeId } from "@/lib/utils";
-import { giftWraps } from "@/lib/data/books";
+/**
+ * Cart context — manages the shopping cart state in memory.
+ * When a user is logged in, cart is also synced to the database.
+ */
+import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import toast from 'react-hot-toast';
 
-const STORAGE_KEY = "bookgift.cart.v1";
-const FREE_SHIPPING_THRESHOLD = 35;
-const SHIPPING_FLAT = 4.99;
+export interface CartBook {
+  id: string;
+  title: string;
+  author: string;
+  price: number;
+  discountPrice?: number | null;
+  coverImage?: string | null;
+  stock: number;
+}
 
-interface CartState {
+export interface CartItem {
+  book: CartBook;
+  quantity: number;
+}
+
+interface CartContextType {
   items: CartItem[];
+  addItem: (book: CartBook) => void;
+  removeItem: (bookId: string) => void;
+  updateQuantity: (bookId: string, quantity: number) => void;
+  clearCart: () => void;
+  totalItems: number;
+  totalPrice: number;
 }
 
-type CartAction =
-  | { type: "HYDRATE"; items: CartItem[] }
-  | { type: "ADD"; book: Book; quantity?: number; gift?: GiftOptions }
-  | { type: "REMOVE"; id: string }
-  | { type: "SET_QTY"; id: string; quantity: number }
-  | { type: "SET_GIFT"; id: string; gift: GiftOptions | undefined }
-  | { type: "CLEAR" };
-
-function reducer(state: CartState, action: CartAction): CartState {
-  switch (action.type) {
-    case "HYDRATE":
-      return { items: action.items };
-    case "ADD": {
-      // Plain (non-gift) lines for the same book stack; gift lines stay distinct.
-      if (!action.gift) {
-        const existing = state.items.find(
-          (i) => i.book.id === action.book.id && !i.gift
-        );
-        if (existing) {
-          return {
-            items: state.items.map((i) =>
-              i.id === existing.id
-                ? { ...i, quantity: i.quantity + (action.quantity ?? 1) }
-                : i
-            ),
-          };
-        }
-      }
-      const item: CartItem = {
-        id: makeId(),
-        book: action.book,
-        quantity: action.quantity ?? 1,
-        gift: action.gift,
-      };
-      return { items: [...state.items, item] };
-    }
-    case "REMOVE":
-      return { items: state.items.filter((i) => i.id !== action.id) };
-    case "SET_QTY":
-      return {
-        items: state.items.map((i) =>
-          i.id === action.id
-            ? { ...i, quantity: Math.max(1, action.quantity) }
-            : i
-        ),
-      };
-    case "SET_GIFT":
-      return {
-        items: state.items.map((i) =>
-          i.id === action.id ? { ...i, gift: action.gift } : i
-        ),
-      };
-    case "CLEAR":
-      return { items: [] };
-    default:
-      return state;
-  }
-}
-
-function giftPrice(gift?: GiftOptions): number {
-  if (!gift) return 0;
-  const wrap = giftWraps.find((w) => w.id === gift.wrapId);
-  const wrapCost = wrap?.price ?? 0;
-  const boxCost = gift.giftBox ? 6.0 : 0;
-  return wrapCost + boxCost;
-}
-
-export function lineTotal(item: CartItem): number {
-  return (item.book.price + giftPrice(item.gift)) * item.quantity;
-}
-
-interface CartContextValue {
-  items: CartItem[];
-  count: number;
-  subtotal: number;
-  shipping: number;
-  total: number;
-  freeShippingThreshold: number;
-  addItem: (book: Book, quantity?: number, gift?: GiftOptions) => void;
-  removeItem: (id: string) => void;
-  setQuantity: (id: string, quantity: number) => void;
-  setGift: (id: string, gift: GiftOptions | undefined) => void;
-  clear: () => void;
-}
-
-const CartContext = createContext<CartContextValue | null>(null);
+const CartContext = createContext<CartContextType>({
+  items: [],
+  addItem: () => {},
+  removeItem: () => {},
+  updateQuantity: () => {},
+  clearCart: () => {},
+  totalItems: 0,
+  totalPrice: 0,
+});
 
 export function CartProvider({ children }: { children: ReactNode }) {
-  const [state, dispatch] = useReducer(reducer, { items: [] });
+  const [items, setItems] = useState<CartItem[]>([]);
 
-  // Hydrate from localStorage on mount.
+  // Load cart from localStorage on startup
   useEffect(() => {
-    try {
-      const raw = window.localStorage.getItem(STORAGE_KEY);
-      if (raw) {
-        const items = JSON.parse(raw) as CartItem[];
-        dispatch({ type: "HYDRATE", items });
+    const saved = localStorage.getItem('cart');
+    if (saved) {
+      try {
+        setItems(JSON.parse(saved));
+      } catch {
+        // ignore corrupt data
       }
-    } catch {
-      /* ignore corrupt storage */
     }
   }, []);
 
-  // Persist on change.
+  // Save to localStorage whenever cart changes
   useEffect(() => {
-    try {
-      window.localStorage.setItem(STORAGE_KEY, JSON.stringify(state.items));
-    } catch {
-      /* storage may be unavailable */
+    localStorage.setItem('cart', JSON.stringify(items));
+  }, [items]);
+
+  const addItem = (book: CartBook) => {
+    setItems((prev) => {
+      const existing = prev.find((i) => i.book.id === book.id);
+      if (existing) {
+        if (existing.quantity >= book.stock) {
+          toast.error('No more stock available');
+          return prev;
+        }
+        toast.success('Quantity updated!');
+        return prev.map((i) =>
+          i.book.id === book.id ? { ...i, quantity: i.quantity + 1 } : i
+        );
+      }
+      toast.success('Added to cart!');
+      return [...prev, { book, quantity: 1 }];
+    });
+  };
+
+  const removeItem = (bookId: string) => {
+    setItems((prev) => prev.filter((i) => i.book.id !== bookId));
+    toast.success('Removed from cart');
+  };
+
+  const updateQuantity = (bookId: string, quantity: number) => {
+    if (quantity < 1) {
+      removeItem(bookId);
+      return;
     }
-  }, [state.items]);
+    setItems((prev) =>
+      prev.map((i) => (i.book.id === bookId ? { ...i, quantity } : i))
+    );
+  };
 
-  const value = useMemo<CartContextValue>(() => {
-    const count = state.items.reduce((n, i) => n + i.quantity, 0);
-    const subtotal = state.items.reduce((sum, i) => sum + lineTotal(i), 0);
-    const shipping =
-      subtotal === 0 || subtotal >= FREE_SHIPPING_THRESHOLD ? 0 : SHIPPING_FLAT;
-    return {
-      items: state.items,
-      count,
-      subtotal,
-      shipping,
-      total: subtotal + shipping,
-      freeShippingThreshold: FREE_SHIPPING_THRESHOLD,
-      addItem: (book, quantity, gift) =>
-        dispatch({ type: "ADD", book, quantity, gift }),
-      removeItem: (id) => dispatch({ type: "REMOVE", id }),
-      setQuantity: (id, quantity) =>
-        dispatch({ type: "SET_QTY", id, quantity }),
-      setGift: (id, gift) => dispatch({ type: "SET_GIFT", id, gift }),
-      clear: () => dispatch({ type: "CLEAR" }),
-    };
-  }, [state.items]);
+  const clearCart = () => setItems([]);
 
-  return <CartContext.Provider value={value}>{children}</CartContext.Provider>;
+  const totalItems = items.reduce((sum, i) => sum + i.quantity, 0);
+  const totalPrice = items.reduce((sum, i) => {
+    const price = i.book.discountPrice ?? i.book.price;
+    return sum + price * i.quantity;
+  }, 0);
+
+  return (
+    <CartContext.Provider
+      value={{ items, addItem, removeItem, updateQuantity, clearCart, totalItems, totalPrice }}
+    >
+      {children}
+    </CartContext.Provider>
+  );
 }
 
-export function useCart(): CartContextValue {
-  const ctx = useContext(CartContext);
-  if (!ctx) throw new Error("useCart must be used within <CartProvider>");
-  return ctx;
+export function useCart() {
+  return useContext(CartContext);
 }

@@ -1,53 +1,49 @@
-import type { Config } from "tailwindcss";
+import type { Config } from 'tailwindcss';
 
 const config: Config = {
   content: [
-    "./src/app/**/*.{ts,tsx}",
-    "./src/components/**/*.{ts,tsx}",
+    './src/pages/**/*.{js,ts,jsx,tsx,mdx}',
+    './src/components/**/*.{js,ts,jsx,tsx,mdx}',
+    './src/app/**/*.{js,ts,jsx,tsx,mdx}',
   ],
   theme: {
     extend: {
       colors: {
-        // Warm "paper" book-store palette
-        paper: "#FAF7F2",
-        cream: "#F4EEE3",
-        ink: {
-          DEFAULT: "#1F1B16",
-          soft: "#4B463E",
-          muted: "#8A8178",
+        // Primary brand color – deep navy
+        primary: {
+          50: '#eff6ff',
+          100: '#dbeafe',
+          500: '#3b82f6',
+          600: '#2563eb',
+          700: '#1d4ed8',
+          900: '#1e3a5f',
         },
-        brand: {
-          50: "#FBF3EE",
-          100: "#F6E2D6",
-          200: "#EBC2AC",
-          300: "#DF9E7C",
-          400: "#D17A52",
-          500: "#C2410C", // primary terracotta
-          600: "#A6360A",
-          700: "#852C09",
-          800: "#65230A",
-          900: "#4A1B0A",
+        // Accent – warm amber
+        accent: {
+          400: '#fbbf24',
+          500: '#f59e0b',
+          600: '#d97706',
         },
-        ribbon: {
-          DEFAULT: "#8E2D52", // gifting accent (ribbon burgundy)
-          soft: "#B85A7C",
-        },
-        sage: "#5B6B4E",
       },
       fontFamily: {
-        serif: ["var(--font-serif)", "Georgia", "serif"],
-        sans: ["var(--font-sans)", "system-ui", "sans-serif"],
+        sans: ['Inter', 'system-ui', 'sans-serif'],
+        // Hebrew-friendly font stack
+        hebrew: ['David Libre', 'FrankRuhlLibre', 'serif'],
       },
-      borderRadius: {
-        xl: "0.875rem",
-        "2xl": "1.25rem",
+      animation: {
+        'fade-in': 'fadeIn 0.3s ease-in-out',
+        'slide-up': 'slideUp 0.3s ease-out',
+        'spin-slow': 'spin 3s linear infinite',
       },
-      boxShadow: {
-        card: "0 1px 2px rgba(31,27,22,0.04), 0 8px 24px rgba(31,27,22,0.06)",
-        lift: "0 12px 40px rgba(31,27,22,0.12)",
-      },
-      maxWidth: {
-        content: "1200px",
+      keyframes: {
+        fadeIn: {
+          '0%': { opacity: '0' },
+          '100%': { opacity: '1' },
+        },
+        slideUp: {
+          '0%': { transform: 'translateY(10px)', opacity: '0' },
+          '100%': { transform: 'translateY(0)', opacity: '1' },
+        },
       },
     },
   },

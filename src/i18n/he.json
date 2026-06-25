@@ -1,0 +1,115 @@
+{
+  "nav": {
+    "home": "בית",
+    "books": "ספרים",
+    "categories": "קטגוריות",
+    "cart": "סל קניות",
+    "login": "התחברות",
+    "logout": "יציאה",
+    "register": "הרשמה",
+    "profile": "הפרופיל שלי",
+    "orders": "ההזמנות שלי",
+    "wishlist": "רשימת משאלות",
+    "admin": "ניהול"
+  },
+  "home": {
+    "hero_title": "גלה את הספר הבא שלך",
+    "hero_subtitle": "עיין באלפי ספרים בעברית ובאנגלית. מצא מדריכי תכנות, בדיה, מדע ועוד.",
+    "hero_cta": "לחנות",
+    "featured_title": "ספרים מומלצים",
+    "categories_title": "עיין לפי קטגוריה",
+    "search_placeholder": "חפש ספרים, סופרים, ISBN..."
+  },
+  "book": {
+    "add_to_cart": "הוסף לסל",
+    "add_to_wishlist": "הוסף לרשימת משאלות",
+    "remove_from_wishlist": "הסר מרשימת משאלות",
+    "in_stock": "במלאי",
+    "out_of_stock": "אזל מהמלאי",
+    "reviews": "ביקורות",
+    "related_books": "ספרים דומים",
+    "pages": "עמודים",
+    "language": "שפה",
+    "publisher": "מוציא לאור",
+    "description": "תיאור",
+    "write_review": "כתוב ביקורת",
+    "no_reviews": "אין עדיין ביקורות. היה הראשון!"
+  },
+  "cart": {
+    "title": "סל הקניות שלך",
+    "empty": "הסל שלך ריק",
+    "empty_cta": "עיין בספרים",
+    "total": "סה\"כ",
+    "checkout": "המשך לתשלום",
+    "remove": "הסר",
+    "quantity": "כמות",
+    "subtotal": "סכום ביניים"
+  },
+  "checkout": {
+    "title": "תשלום",
+    "shipping": "כתובת למשלוח",
+    "payment": "תשלום",
+    "place_order": "בצע הזמנה",
+    "order_summary": "סיכום הזמנה",
+    "full_name": "שם מלא",
+    "address": "כתובת",
+    "city": "עיר",
+    "country": "מדינה",
+    "zip": "מיקוד"
+  },
+  "auth": {
+    "login_title": "התחברות",
+    "register_title": "יצירת חשבון",
+    "email": "אימייל",
+    "password": "סיסמה",
+    "name": "שם מלא",
+    "login_btn": "התחבר",
+    "register_btn": "צור חשבון",
+    "no_account": "אין לך חשבון?",
+    "have_account": "כבר יש לך חשבון?",
+    "sign_up": "הירשם",
+    "sign_in": "התחבר"
+  },
+  "chatbot": {
+    "title": "עוזר הספרים",
+    "placeholder": "שאל אותי כל שאלה על ספרים...",
+    "send": "שלח",
+    "greeting": "שלום! אני עוזר הספרים שלך. שאל אותי להמליץ על ספרים, לבדוק זמינות, או לעזור לך למצוא את הקריאה הבאה שלך!"
+  },
+  "filters": {
+    "title": "סינון",
+    "category": "קטגוריה",
+    "language": "שפה",
+    "price_range": "טווח מחירים",
+    "all_categories": "כל הקטגוריות",
+    "all_languages": "כל השפות",
+    "english": "אנגלית",
+    "hebrew": "עברית",
+    "clear": "נקה סינון",
+    "sort_by": "מיין לפי",
+    "sort_newest": "חדש ביותר",
+    "sort_price_asc": "מחיר: מהנמוך לגבוה",
+    "sort_price_desc": "מחיר: מהגבוה לנמוך",
+    "sort_rating": "מדורג עליון"
+  },
+  "admin": {
+    "dashboard": "לוח בקרה",
+    "books": "ספרים",
+    "orders": "הזמנות",
+    "users": "משתמשים",
+    "categories": "קטגוריות",
+    "add_book": "הוסף ספר",
+    "edit_book": "ערוך ספר",
+    "delete_book": "מחק ספר",
+    "total_orders": "סה\"כ הזמנות",
+    "total_users": "סה\"כ משתמשים",
+    "total_books": "סה\"כ ספרים",
+    "revenue": "הכנסות"
+  },
+  "errors": {
+    "not_found": "הדף לא נמצא",
+    "not_found_desc": "הדף שחיפשת אינו קיים.",
+    "go_home": "חזור לדף הבית",
+    "generic": "משהו השתבש. נסה שוב."
+  }
+}

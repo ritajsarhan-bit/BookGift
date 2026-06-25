@@ -1,171 +1,122 @@
-import type { Metadata } from "next";
-import { Container } from "@/components/ui/Container";
-import { Badge } from "@/components/ui/Badge";
-import { getAllBooks } from "@/lib/data/books";
-import { formatPrice } from "@/lib/utils";
+'use client';
 
-export const metadata: Metadata = {
-  title: "Admin Dashboard",
-};
+import { useEffect, useState } from 'react';
+import { formatPrice } from '@/lib/utils';
+import Link from 'next/link';
 
-const stats = [
-  { label: "Revenue (30d)", value: "$12,480", delta: "+18%" },
-  { label: "Orders", value: "342", delta: "+9%" },
-  { label: "Gift orders", value: "128", delta: "+24%" },
-  { label: "Avg. order value", value: "$36.50", delta: "+3%" },
-];
+interface Stats {
+  totalBooks: number;
+  totalUsers: number;
+  totalOrders: number;
+  revenue: number;
+  recentOrders: any[];
+}
 
-const recentOrders = [
-  { id: "BG-849201", customer: "Jane R.", total: 42.49, status: "Wrapped" },
-  { id: "BG-849200", customer: "Mark T.", total: 18.99, status: "Shipped" },
-  { id: "BG-849199", customer: "Aisha K.", total: 67.0, status: "Processing" },
-  { id: "BG-849198", customer: "Leo M.", total: 24.99, status: "Delivered" },
-  { id: "BG-849197", customer: "Sara P.", total: 31.5, status: "Wrapped" },
-];
+export default function AdminDashboard() {
+  const [stats, setStats] = useState<Stats | null>(null);
+  const [loading, setLoading] = useState(true);
 
-const navItems = [
-  { label: "Overview", active: true },
-  { label: "Orders", active: false },
-  { label: "Inventory", active: false },
-  { label: "Gift wraps", active: false },
-  { label: "Customers", active: false },
-  { label: "Settings", active: false },
-];
+  useEffect(() => {
+    fetch('/api/admin/stats')
+      .then((r) => r.json())
+      .then(setStats)
+      .finally(() => setLoading(false));
+  }, []);
 
-const statusTone: Record<string, "brand" | "ribbon" | "sage" | "neutral"> = {
-  Processing: "neutral",
-  Wrapped: "ribbon",
-  Shipped: "brand",
-  Delivered: "sage",
-};
+  if (loading) {
+    return (
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+        {[1,2,3,4].map((i) => (
+          <div key={i} className="card p-6 animate-pulse h-28">
+            <div className="h-4 bg-gray-200 rounded w-1/2 mb-3" />
+            <div className="h-8 bg-gray-200 rounded w-3/4" />
+          </div>
+        ))}
+      </div>
+    );
+  }
 
-export default function AdminPage() {
-  const books = getAllBooks();
+  const STAT_CARDS = [
+    { label: 'Total Books', value: stats?.totalBooks ?? 0, icon: '📚', color: 'bg-blue-50 text-blue-700', link: '/admin/books' },
+    { label: 'Total Users', value: stats?.totalUsers ?? 0, icon: '👥', color: 'bg-green-50 text-green-700', link: '/admin/users' },
+    { label: 'Total Orders', value: stats?.totalOrders ?? 0, icon: '📦', color: 'bg-purple-50 text-purple-700', link: '/admin/orders' },
+    { label: 'Revenue', value: formatPrice(stats?.revenue ?? 0), icon: '💰', color: 'bg-amber-50 text-amber-700' },
+  ];
 
   return (
-    <Container className="py-12">
-      <div className="mb-8 flex flex-wrap items-center justify-between gap-3">
-        <div>
-          <div className="flex items-center gap-3">
-            <h1 className="font-serif text-3xl font-semibold text-ink">
-              Admin
-            </h1>
-            <Badge tone="neutral">Placeholder</Badge>
+    <div>
+      <h1 className="text-2xl font-bold text-gray-900 mb-8">Dashboard</h1>
+
+      {/* Stats cards */}
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+        {STAT_CARDS.map((s) => (
+          <div key={s.label} className={`card p-6 ${s.link ? 'hover:shadow-md transition-shadow cursor-pointer' : ''}`}>
+            {s.link ? (
+              <Link href={s.link} className="block">
+                <StatCard {...s} />
+              </Link>
+            ) : (
+              <StatCard {...s} />
+            )}
           </div>
-          <p className="mt-1 text-ink-soft">
-            Static preview · no authentication or live data yet.
-          </p>
-        </div>
+        ))}
       </div>
 
-      <div className="grid gap-8 lg:grid-cols-[220px_1fr]">
-        {/* Sidebar */}
-        <aside className="h-fit rounded-2xl border border-ink/8 bg-white p-3 shadow-card lg:sticky lg:top-24">
-          <nav className="space-y-1">
-            {navItems.map((item) => (
-              <button
-                key={item.label}
-                className={
-                  "flex w-full items-center rounded-xl px-3.5 py-2.5 text-sm font-medium transition-colors " +
-                  (item.active
-                    ? "bg-brand-50 text-brand-700"
-                    : "text-ink-soft hover:bg-ink/5")
-                }
-              >
-                {item.label}
-              </button>
-            ))}
-          </nav>
-        </aside>
-
-        {/* Content */}
-        <div className="space-y-8">
-          {/* Stats */}
-          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-            {stats.map((s) => (
-              <div
-                key={s.label}
-                className="rounded-2xl border border-ink/8 bg-white p-5 shadow-card"
-              >
-                <p className="text-sm text-ink-muted">{s.label}</p>
-                <p className="mt-1 font-serif text-2xl font-semibold text-ink">
-                  {s.value}
-                </p>
-                <p className="mt-1 text-xs font-medium text-sage">{s.delta}</p>
-              </div>
-            ))}
-          </div>
-
-          {/* Recent orders */}
-          <section className="overflow-hidden rounded-2xl border border-ink/8 bg-white shadow-card">
-            <div className="border-b border-ink/8 px-5 py-4">
-              <h2 className="font-serif text-lg font-semibold text-ink">
-                Recent orders
-              </h2>
-            </div>
-            <table className="w-full text-sm">
-              <thead>
-                <tr className="border-b border-ink/8 text-left text-xs uppercase tracking-wide text-ink-muted">
-                  <th className="px-5 py-3 font-medium">Order</th>
-                  <th className="px-5 py-3 font-medium">Customer</th>
-                  <th className="px-5 py-3 font-medium">Status</th>
-                  <th className="px-5 py-3 text-right font-medium">Total</th>
-                </tr>
-              </thead>
-              <tbody>
-                {recentOrders.map((o) => (
-                  <tr
-                    key={o.id}
-                    className="border-b border-ink/5 last:border-0 hover:bg-cream/40"
-                  >
-                    <td className="px-5 py-3 font-medium text-ink">{o.id}</td>
-                    <td className="px-5 py-3 text-ink-soft">{o.customer}</td>
-                    <td className="px-5 py-3">
-                      <Badge tone={statusTone[o.status]}>{o.status}</Badge>
-                    </td>
-                    <td className="px-5 py-3 text-right font-medium text-ink">
-                      {formatPrice(o.total)}
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </section>
-
-          {/* Inventory preview */}
-          <section className="overflow-hidden rounded-2xl border border-ink/8 bg-white shadow-card">
-            <div className="flex items-center justify-between border-b border-ink/8 px-5 py-4">
-              <h2 className="font-serif text-lg font-semibold text-ink">
-                Inventory
-              </h2>
-              <span className="text-sm text-ink-muted">{books.length} titles</span>
-            </div>
-            <table className="w-full text-sm">
-              <thead>
-                <tr className="border-b border-ink/8 text-left text-xs uppercase tracking-wide text-ink-muted">
-                  <th className="px-5 py-3 font-medium">Title</th>
-                  <th className="px-5 py-3 font-medium">Genre</th>
-                  <th className="px-5 py-3 text-right font-medium">Price</th>
-                </tr>
-              </thead>
-              <tbody>
-                {books.slice(0, 6).map((b) => (
-                  <tr
-                    key={b.id}
-                    className="border-b border-ink/5 last:border-0 hover:bg-cream/40"
-                  >
-                    <td className="px-5 py-3 font-medium text-ink">{b.title}</td>
-                    <td className="px-5 py-3 text-ink-soft">{b.genre}</td>
-                    <td className="px-5 py-3 text-right font-medium text-ink">
-                      {formatPrice(b.price)}
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </section>
-        </div>
+      {/* Quick actions */}
+      <div className="flex gap-3 mb-8">
+        <Link href="/admin/books?action=add" className="btn-primary">+ Add Book</Link>
+        <Link href="/admin/categories" className="btn-secondary">Manage Categories</Link>
       </div>
-    </Container>
+
+      {/* Recent orders */}
+      <div className="card overflow-hidden">
+        <div className="px-6 py-4 border-b border-gray-100 flex items-center justify-between">
+          <h2 className="font-bold text-gray-900">Recent Orders</h2>
+          <Link href="/admin/orders" className="text-sm text-blue-600 hover:underline">View all</Link>
+        </div>
+        {stats?.recentOrders && stats.recentOrders.length > 0 ? (
+          <table className="w-full text-sm">
+            <thead className="bg-gray-50">
+              <tr>
+                <th className="text-left px-6 py-3 text-gray-500 font-medium">Order</th>
+                <th className="text-left px-6 py-3 text-gray-500 font-medium">Customer</th>
+                <th className="text-left px-6 py-3 text-gray-500 font-medium">Status</th>
+                <th className="text-right px-6 py-3 text-gray-500 font-medium">Total</th>
+              </tr>
+            </thead>
+            <tbody>
+              {stats.recentOrders.map((order: any) => (
+                <tr key={order.id} className="border-t border-gray-50 hover:bg-gray-50">
+                  <td className="px-6 py-3 font-mono text-gray-500">#{order.id.slice(-6).toUpperCase()}</td>
+                  <td className="px-6 py-3 text-gray-700">{order.user?.name ?? 'Unknown'}</td>
+                  <td className="px-6 py-3">
+                    <span className={`text-xs font-semibold px-2 py-1 rounded-full ${
+                      order.status === 'PAID' ? 'bg-blue-100 text-blue-700' :
+                      order.status === 'DELIVERED' ? 'bg-green-100 text-green-700' :
+                      'bg-gray-100 text-gray-600'
+                    }`}>{order.status}</span>
+                  </td>
+                  <td className="px-6 py-3 text-right font-semibold">{formatPrice(order.total)}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        ) : (
+          <p className="px-6 py-8 text-center text-gray-400">No orders yet</p>
+        )}
+      </div>
+    </div>
+  );
+}
+
+function StatCard({ label, value, icon, color }: { label: string; value: string | number; icon: string; color: string }) {
+  return (
+    <>
+      <div className={`inline-flex items-center justify-center w-10 h-10 rounded-xl ${color} text-xl mb-3`}>
+        {icon}
+      </div>
+      <p className="text-sm text-gray-500">{label}</p>
+      <p className="text-2xl font-bold text-gray-900 mt-1">{value}</p>
+    </>
   );
 }

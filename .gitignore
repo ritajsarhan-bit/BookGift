@@ -1,7 +1,10 @@
 # dependencies
-/node_modules
+node_modules/
 /.pnp
 .pnp.js
+
+# testing
+/coverage
 
 # next.js
 /.next/
@@ -10,22 +13,24 @@
 # production
 /build
 
-# misc
-.DS_Store
-*.pem
-
-# debug
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
-
-# local env files
+# env files — never commit real secrets
 .env
-.env*.local
+.env.local
+.env.*.local
+
+# vercel
+.vercel
 
 # typescript
 *.tsbuildinfo
 next-env.d.ts
 
-# vercel
-.vercel
+# misc
+.DS_Store
+*.pem
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Claude Code memory
+.claude/

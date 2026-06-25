@@ -1,46 +1,29 @@
-import type { Metadata } from "next";
-import { Fraunces, Inter } from "next/font/google";
-import "./globals.css";
-import { CartProvider } from "@/context/CartContext";
-import { Header } from "@/components/layout/Header";
-import { Footer } from "@/components/layout/Footer";
-import { ChatbotWidget } from "@/components/chat/ChatbotWidget";
-
-const serif = Fraunces({
-  subsets: ["latin"],
-  variable: "--font-serif",
-  display: "swap",
-});
-
-const sans = Inter({
-  subsets: ["latin"],
-  variable: "--font-sans",
-  display: "swap",
-});
+import type { Metadata } from 'next';
+import './globals.css';
+import { Providers } from '@/components/Providers';
 
 export const metadata: Metadata = {
   title: {
-    default: "BookGift · Personalized Book Gifting",
-    template: "%s · BookGift",
+    default: 'BookStore – Your Online Library',
+    template: '%s | BookStore',
   },
   description:
-    "Hand-picked books, beautifully wrapped. Buy a book and customize the gift wrapping for someone you love.",
+    'Discover thousands of books in English and Hebrew. Programming, fiction, science, children\'s books and more.',
+  keywords: ['books', 'online bookstore', 'ebooks', 'Hebrew books', 'programming books'],
+  openGraph: {
+    type: 'website',
+    title: 'BookStore',
+    description: 'Your online library in English and Hebrew',
+    siteName: 'BookStore',
+  },
 };
 
-export default function RootLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
+export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" className={`${serif.variable} ${sans.variable}`}>
-      <body className="flex min-h-screen flex-col font-sans">
-        <CartProvider>
-          <Header />
-          <main className="flex-1">{children}</main>
-          <Footer />
-          <ChatbotWidget />
-        </CartProvider>
+    // lang and dir are set dynamically by LanguageContext on the client
+    <html lang="en">
+      <body className="min-h-screen flex flex-col">
+        <Providers>{children}</Providers>
       </body>
     </html>
   );

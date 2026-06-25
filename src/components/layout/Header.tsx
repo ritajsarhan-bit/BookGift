@@ -1,127 +1,165 @@
-"use client";
+'use client';
 
-import { useState } from "react";
-import Link from "next/link";
-import { usePathname } from "next/navigation";
-import { cn } from "@/lib/utils";
-import { useCart } from "@/context/CartContext";
+import Link from 'next/link';
+import { useSession, signOut } from 'next-auth/react';
+import { useCart } from '@/context/CartContext';
+import { useLanguage } from '@/context/LanguageContext';
+import { useState } from 'react';
+import { FiShoppingCart, FiUser, FiMenu, FiX, FiSearch, FiHeart, FiLogOut } from 'react-icons/fi';
+import SearchBar from '@/components/ui/SearchBar';
 
-const navLinks = [
-  { href: "/books", label: "Books" },
-  { href: "/books?category=Children", label: "For Kids" },
-  { href: "/gift", label: "Gift Wrapping" },
-  { href: "/admin", label: "Admin" },
-];
+export default function Header() {
+  const { data: session } = useSession();
+  const { totalItems } = useCart();
+  const { t, language, setLanguage, isRTL } = useLanguage();
+  const [mobileOpen, setMobileOpen] = useState(false);
+  const [searchOpen, setSearchOpen] = useState(false);
+  const [userMenuOpen, setUserMenuOpen] = useState(false);
 
-export function Header() {
-  const pathname = usePathname();
-  const { count } = useCart();
-  const [open, setOpen] = useState(false);
+  const isAdmin = (session?.user as any)?.role === 'ADMIN';
 
   return (
-    <header className="sticky top-0 z-40 border-b border-ink/8 bg-paper/85 backdrop-blur-md">
-      <div className="mx-auto flex h-16 w-full max-w-content items-center justify-between px-4 sm:px-6 lg:px-8">
-        {/* Logo */}
-        <Link href="/" className="flex items-center gap-2">
-          <span className="grid h-9 w-9 place-items-center rounded-xl bg-brand-500 text-paper">
-            <svg viewBox="0 0 24 24" className="h-5 w-5" fill="currentColor">
-              <path d="M4 4.5A2.5 2.5 0 016.5 2H20v17H6.5A2.5 2.5 0 004 21.5v-17z" opacity="0.35" />
-              <path d="M20 19H6.5A2.5 2.5 0 004 21.5V5a2 2 0 012-2h14v16z" fill="none" stroke="currentColor" strokeWidth="1.5" />
-            </svg>
-          </span>
-          <span className="font-serif text-xl font-semibold tracking-tight text-ink">
-            Book<span className="text-brand-500">Gift</span>
-          </span>
-        </Link>
+    <header className="bg-white shadow-sm sticky top-0 z-50 border-b border-gray-100">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="flex items-center justify-between h-16">
+          {/* Logo */}
+          <Link href="/" className="flex items-center gap-2 font-bold text-2xl text-blue-800">
+            📚 BookStore
+          </Link>
 
-        {/* Desktop nav */}
-        <nav className="hidden items-center gap-1 md:flex">
-          {navLinks.map((link) => {
-            const active = pathname === link.href.split("?")[0];
-            return (
-              <Link
-                key={link.label}
-                href={link.href}
-                className={cn(
-                  "rounded-full px-3.5 py-2 text-sm font-medium transition-colors",
-                  active
-                    ? "text-brand-600"
-                    : "text-ink-soft hover:text-ink"
-                )}
-              >
-                {link.label}
+          {/* Desktop nav links */}
+          <nav className="hidden md:flex items-center gap-6 text-sm font-medium text-gray-700">
+            <Link href="/" className="hover:text-blue-700 transition-colors">{t.nav.home}</Link>
+            <Link href="/books" className="hover:text-blue-700 transition-colors">{t.nav.books}</Link>
+            <Link href="/books?lang=he" className="hover:text-blue-700 transition-colors">
+              ספרים בעברית
+            </Link>
+            {isAdmin && (
+              <Link href="/admin" className="hover:text-blue-700 transition-colors text-amber-600 font-semibold">
+                {t.nav.admin}
               </Link>
-            );
-          })}
-        </nav>
-
-        {/* Actions */}
-        <div className="flex items-center gap-1.5">
-          <Link
-            href="/login"
-            className="hidden rounded-full px-3.5 py-2 text-sm font-medium text-ink-soft transition-colors hover:text-ink sm:block"
-          >
-            Sign in
-          </Link>
-
-          <Link
-            href="/cart"
-            className="relative grid h-10 w-10 place-items-center rounded-full text-ink transition-colors hover:bg-ink/5"
-            aria-label={`Cart with ${count} items`}
-          >
-            <svg viewBox="0 0 24 24" className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth="1.7">
-              <path d="M3 4h2l2.4 12.3a1 1 0 001 .7h8.7a1 1 0 001-.8L21 8H6" strokeLinecap="round" strokeLinejoin="round" />
-              <circle cx="9" cy="20" r="1.4" />
-              <circle cx="18" cy="20" r="1.4" />
-            </svg>
-            {count > 0 && (
-              <span className="absolute -right-0.5 -top-0.5 grid h-5 min-w-[20px] place-items-center rounded-full bg-ribbon px-1 text-[11px] font-semibold text-white">
-                {count}
-              </span>
             )}
-          </Link>
+          </nav>
 
-          {/* Mobile toggle */}
-          <button
-            onClick={() => setOpen((v) => !v)}
-            className="grid h-10 w-10 place-items-center rounded-full text-ink hover:bg-ink/5 md:hidden"
-            aria-label="Toggle menu"
-          >
-            <svg viewBox="0 0 24 24" className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth="1.8">
-              {open ? (
-                <path d="M6 6l12 12M18 6L6 18" strokeLinecap="round" />
-              ) : (
-                <path d="M4 7h16M4 12h16M4 17h16" strokeLinecap="round" />
+          {/* Right-side actions */}
+          <div className="flex items-center gap-3">
+            {/* Search */}
+            <button
+              onClick={() => setSearchOpen(true)}
+              className="p-2 text-gray-600 hover:text-blue-700 hover:bg-gray-100 rounded-full transition-colors"
+              aria-label="Search"
+            >
+              <FiSearch size={20} />
+            </button>
+
+            {/* Language switcher */}
+            <button
+              onClick={() => setLanguage(language === 'en' ? 'he' : 'en')}
+              className="hidden sm:flex items-center gap-1 px-3 py-1.5 text-sm font-medium border border-gray-200 rounded-full hover:bg-gray-50 transition-colors"
+            >
+              {language === 'en' ? '🇮🇱 עברית' : '🇺🇸 English'}
+            </button>
+
+            {/* Cart */}
+            <Link
+              href="/cart"
+              className="relative p-2 text-gray-600 hover:text-blue-700 hover:bg-gray-100 rounded-full transition-colors"
+              aria-label="Cart"
+            >
+              <FiShoppingCart size={20} />
+              {totalItems > 0 && (
+                <span className="absolute -top-1 -right-1 bg-blue-700 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center font-bold">
+                  {totalItems > 9 ? '9+' : totalItems}
+                </span>
               )}
-            </svg>
-          </button>
+            </Link>
+
+            {/* User menu */}
+            {session ? (
+              <div className="relative">
+                <button
+                  onClick={() => setUserMenuOpen(!userMenuOpen)}
+                  className="flex items-center gap-2 p-2 text-gray-600 hover:text-blue-700 hover:bg-gray-100 rounded-full transition-colors"
+                >
+                  <FiUser size={20} />
+                </button>
+                {userMenuOpen && (
+                  <div className="absolute right-0 mt-2 w-52 bg-white rounded-xl shadow-lg border border-gray-100 py-1 z-50 animate-fade-in">
+                    <div className="px-4 py-2 border-b border-gray-100">
+                      <p className="text-sm font-semibold text-gray-900">{session.user?.name}</p>
+                      <p className="text-xs text-gray-500 truncate">{session.user?.email}</p>
+                    </div>
+                    <Link href="/profile" className="flex items-center gap-2 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50" onClick={() => setUserMenuOpen(false)}>
+                      <FiUser size={16} /> {t.nav.profile}
+                    </Link>
+                    <Link href="/orders" className="flex items-center gap-2 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50" onClick={() => setUserMenuOpen(false)}>
+                      📦 {t.nav.orders}
+                    </Link>
+                    <Link href="/wishlist" className="flex items-center gap-2 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50" onClick={() => setUserMenuOpen(false)}>
+                      <FiHeart size={16} /> {t.nav.wishlist}
+                    </Link>
+                    {isAdmin && (
+                      <Link href="/admin" className="flex items-center gap-2 px-4 py-2 text-sm text-amber-600 font-semibold hover:bg-amber-50" onClick={() => setUserMenuOpen(false)}>
+                        ⚙️ {t.nav.admin}
+                      </Link>
+                    )}
+                    <hr className="my-1 border-gray-100" />
+                    <button
+                      onClick={() => { signOut({ callbackUrl: '/' }); setUserMenuOpen(false); }}
+                      className="flex items-center gap-2 w-full px-4 py-2 text-sm text-red-600 hover:bg-red-50"
+                    >
+                      <FiLogOut size={16} /> {t.nav.logout}
+                    </button>
+                  </div>
+                )}
+              </div>
+            ) : (
+              <div className="hidden sm:flex items-center gap-2">
+                <Link href="/login" className="text-sm font-medium text-gray-700 hover:text-blue-700 transition-colors px-3 py-2">
+                  {t.nav.login}
+                </Link>
+                <Link href="/register" className="btn-primary text-sm py-2 px-4">
+                  {t.nav.register}
+                </Link>
+              </div>
+            )}
+
+            {/* Mobile menu button */}
+            <button
+              className="md:hidden p-2 text-gray-600 hover:bg-gray-100 rounded-full"
+              onClick={() => setMobileOpen(!mobileOpen)}
+            >
+              {mobileOpen ? <FiX size={22} /> : <FiMenu size={22} />}
+            </button>
+          </div>
         </div>
+
+        {/* Mobile nav */}
+        {mobileOpen && (
+          <div className="md:hidden py-4 border-t border-gray-100 animate-fade-in">
+            <nav className="flex flex-col gap-3 text-sm font-medium">
+              <Link href="/" className="py-2 text-gray-700 hover:text-blue-700" onClick={() => setMobileOpen(false)}>{t.nav.home}</Link>
+              <Link href="/books" className="py-2 text-gray-700 hover:text-blue-700" onClick={() => setMobileOpen(false)}>{t.nav.books}</Link>
+              <Link href="/cart" className="py-2 text-gray-700 hover:text-blue-700" onClick={() => setMobileOpen(false)}>{t.nav.cart} ({totalItems})</Link>
+              {!session && (
+                <>
+                  <Link href="/login" className="py-2 text-gray-700 hover:text-blue-700" onClick={() => setMobileOpen(false)}>{t.nav.login}</Link>
+                  <Link href="/register" className="py-2 text-gray-700 hover:text-blue-700" onClick={() => setMobileOpen(false)}>{t.nav.register}</Link>
+                </>
+              )}
+              <button
+                onClick={() => setLanguage(language === 'en' ? 'he' : 'en')}
+                className="text-left py-2 text-gray-700"
+              >
+                {language === 'en' ? '🇮🇱 Switch to Hebrew' : '🇺🇸 Switch to English'}
+              </button>
+            </nav>
+          </div>
+        )}
       </div>
 
-      {/* Mobile nav */}
-      {open && (
-        <nav className="border-t border-ink/8 bg-paper px-4 py-3 md:hidden">
-          <div className="flex flex-col gap-1">
-            {navLinks.map((link) => (
-              <Link
-                key={link.label}
-                href={link.href}
-                onClick={() => setOpen(false)}
-                className="rounded-xl px-3 py-2.5 text-sm font-medium text-ink-soft hover:bg-ink/5"
-              >
-                {link.label}
-              </Link>
-            ))}
-            <Link
-              href="/login"
-              onClick={() => setOpen(false)}
-              className="rounded-xl px-3 py-2.5 text-sm font-medium text-ink-soft hover:bg-ink/5"
-            >
-              Sign in
-            </Link>
-          </div>
-        </nav>
-      )}
+      {/* Search overlay */}
+      {searchOpen && <SearchBar onClose={() => setSearchOpen(false)} />}
     </header>
   );
 }
