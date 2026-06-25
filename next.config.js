@@ -10,9 +10,7 @@ const nextConfig = {
     ],
   },
   // Support for internationalization (Hebrew RTL + English)
-  experimental: {
-    serverActions: true,
-  },
+
 };
 
 module.exports = nextConfig;
