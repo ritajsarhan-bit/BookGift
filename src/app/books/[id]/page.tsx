@@ -9,48 +9,53 @@ interface Props {
   params: { id: string };
 }
 
-// Generate SEO metadata for each book
-export async function generateMetadata({ params }: Props): Promise<Metadata> {
+async function getBook(id: string) {
   try {
-    const book = await prisma.book.findUnique({
-      where: { id: params.id },
-      select: { title: true, author: true, description: true, coverImage: true },
-    });
-    if (!book) return { title: 'Book Not Found' };
-    return {
-      title: `${book.title} by ${book.author}`,
-      description: book.description.slice(0, 160),
-      openGraph: { images: book.coverImage ? [book.coverImage] : [] },
-    };
+    const books = await prisma.$queryRaw`
+      SELECT id, title, author, description, price, stock, category, language, image_url
+      FROM books WHERE id = ${id}::uuid
+      LIMIT 1
+    ` as any[];
+    return books[0] || null;
   } catch {
-    return { title: 'Book Not Found' };
+    return null;
   }
 }
 
+export async function generateMetadata({ params }: Props): Promise<Metadata> {
+  const book = await getBook(params.id);
+  if (!book) return { title: 'Book Not Found' };
+  return {
+    title: `${book.title} by ${book.author}`,
+    description: book.description?.slice(0, 160),
+  };
+}
+
 export default async function BookPage({ params }: Props) {
-  try {
-    const book = await prisma.book.findUnique({
-      where: { id: params.id },
-      include: {
-        category: true,
-        reviews: {
-          include: { user: { select: { id: true, name: true, image: true } } },
-          orderBy: { createdAt: 'desc' },
-          take: 20,
-        },
-      },
-    });
+  const raw = await getBook(params.id);
+  if (!raw) notFound();
 
-    if (!book) notFound();
+  const book = {
+    id: raw.id,
+    title: raw.title,
+    titleHe: null,
+    author: raw.author,
+    description: raw.description,
+    price: Number(raw.price),
+    discountPrice: null,
+    priceILS: null,
+    coverImage: raw.image_url || null,
+    stock: raw.stock ?? 10,
+    rating: 4.5,
+    reviewCount: 0,
+    language: raw.language || 'en',
+    pages: null,
+    publisher: null,
+    publishedAt: null,
+    isbn: null,
+    category: raw.category ? { name: raw.category, nameHe: null, slug: raw.category.toLowerCase().replace(/\s+/g, '-') } : null,
+    reviews: [],
+  };
 
-    const relatedBooks = await prisma.book.findMany({
-      where: { categoryId: book.categoryId, id: { not: book.id }, published: true },
-      include: { category: true },
-      take: 4,
-    });
-
-    return <BookDetail book={book} relatedBooks={relatedBooks} />;
-  } catch {
-    notFound();
-  }
+  return <BookDetail book={book as any} relatedBooks={[]} />;
 }

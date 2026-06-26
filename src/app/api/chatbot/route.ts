@@ -14,23 +14,10 @@ export async function POST(req: NextRequest) {
     // Fetch the available books so the AI can recommend real ones
     let books: any[] = [];
     try {
-      books = await prisma.book.findMany({
-        where: { published: true },
-        select: {
-          id: true,
-          title: true,
-          titleHe: true,
-          author: true,
-          language: true,
-          price: true,
-          discountPrice: true,
-          rating: true,
-          stock: true,
-          category: { select: { name: true, nameHe: true } },
-          description: true,
-        },
-        take: 50,
-      });
+      books = await prisma.$queryRaw`
+        SELECT id, title, author, price, stock, category, language
+        FROM books ORDER BY created_at DESC LIMIT 50
+      ` as any[];
     } catch {
       books = [];
     }
@@ -38,7 +25,7 @@ export async function POST(req: NextRequest) {
     const bookList = books
       .map(
         (b) =>
-          `- "${b.title}"${b.titleHe ? ` / "${b.titleHe}"` : ''} by ${b.author} | ${b.category?.name} | $${b.discountPrice ?? b.price} | lang:${b.language} | rating:${b.rating} | stock:${b.stock > 0 ? 'available' : 'out of stock'} | id:${b.id}`
+          `- "${b.title}" by ${b.author} | ${b.category} | $${b.price} | lang:${b.language} | stock:${b.stock > 0 ? 'available' : 'out of stock'} | id:${b.id}`
       )
       .join('\n');
 
