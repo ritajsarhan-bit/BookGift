@@ -12,23 +12,28 @@ export async function POST(req: NextRequest) {
     const { message, history = [], language = 'en' } = await req.json();
 
     // Fetch the available books so the AI can recommend real ones
-    const books = await prisma.book.findMany({
-      where: { published: true },
-      select: {
-        id: true,
-        title: true,
-        titleHe: true,
-        author: true,
-        language: true,
-        price: true,
-        discountPrice: true,
-        rating: true,
-        stock: true,
-        category: { select: { name: true, nameHe: true } },
-        description: true,
-      },
-      take: 50,
-    });
+    let books: any[] = [];
+    try {
+      books = await prisma.book.findMany({
+        where: { published: true },
+        select: {
+          id: true,
+          title: true,
+          titleHe: true,
+          author: true,
+          language: true,
+          price: true,
+          discountPrice: true,
+          rating: true,
+          stock: true,
+          category: { select: { name: true, nameHe: true } },
+          description: true,
+        },
+        take: 50,
+      });
+    } catch {
+      books = [];
+    }
 
     const bookList = books
       .map(
