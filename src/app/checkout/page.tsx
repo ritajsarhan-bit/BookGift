@@ -9,10 +9,7 @@ import { formatPrice } from '@/lib/utils';
 import Link from 'next/link';
 import Image from 'next/image';
 import toast from 'react-hot-toast';
-
-// NOTE: For a real Stripe integration you would use @stripe/react-stripe-js
-// This is a simplified checkout that calls our API to create an order.
-// To add real card input: install @stripe/react-stripe-js and use <PaymentElement />
+import GiftOptions, { GiftData, defaultGiftData } from '@/components/checkout/GiftOptions';
 
 export default function CheckoutPage() {
   const { items, totalPrice, clearCart } = useCart();
@@ -20,6 +17,8 @@ export default function CheckoutPage() {
   const { data: session } = useSession();
   const router = useRouter();
   const [loading, setLoading] = useState(false);
+  const [giftData, setGiftData] = useState<GiftData>(defaultGiftData);
+  const [giftErrors, setGiftErrors] = useState<{ wrappingStyle?: string; wrappingColor?: string; giftMessage?: string }>({});
   const [address, setAddress] = useState({
     fullName: session?.user?.name || '',
     address: '',
@@ -47,36 +46,47 @@ export default function CheckoutPage() {
     );
   }
 
+  const validateGift = (): boolean => {
+    const errs: typeof giftErrors = {};
+    if (giftData.giftMessage.length > 300) {
+      errs.giftMessage = 'Message cannot exceed 300 characters.';
+    }
+    if (giftData.giftWrapping) {
+      if (!giftData.wrappingStyle) errs.wrappingStyle = 'Please select a wrapping style.';
+      if (!giftData.wrappingColor) errs.wrappingColor = 'Please select a wrapping color.';
+    }
+    setGiftErrors(errs);
+    return Object.keys(errs).length === 0;
+  };
+
   const handleOrder = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    // Validate shipping fields
     if (!address.address || !address.city || !address.country) {
       toast.error('Please fill in all shipping fields');
       return;
     }
 
+    if (!validateGift()) {
+      toast.error('Please complete the gift options.');
+      return;
+    }
+
     setLoading(true);
     try {
-      // Step 1: Create Stripe PaymentIntent
       const piRes = await fetch('/api/stripe/create-payment-intent', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ amount: Math.round(totalPrice * 100) }), // cents
+        body: JSON.stringify({ amount: Math.round(totalPrice * 100) }),
       });
 
       if (!piRes.ok) {
-        toast.error('Payment initialization failed. Check your Stripe keys in .env');
+        toast.error('Payment initialization failed.');
         return;
       }
 
-      const { clientSecret } = await piRes.json();
-
-      // Step 2: In production you would confirm the payment here with Stripe.js
-      // For demo purposes we simulate a successful payment:
       const mockPaymentId = 'demo_pi_' + Date.now();
 
-      // Step 3: Save order to database
       const orderRes = await fetch('/api/orders', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -89,6 +99,13 @@ export default function CheckoutPage() {
           total: totalPrice,
           stripePaymentId: mockPaymentId,
           shippingAddress: address,
+          isGift: giftData.isGift,
+          giftWrapping: giftData.giftWrapping,
+          giftMessage: giftData.giftMessage || null,
+          wrappingStyle: giftData.wrappingStyle || null,
+          wrappingColor: giftData.wrappingColor || null,
+          ribbonColor: giftData.ribbonColor || null,
+          giftCardDesign: giftData.giftCardDesign || null,
         }),
       });
 
@@ -100,7 +117,7 @@ export default function CheckoutPage() {
       const { order } = await orderRes.json();
       clearCart();
       router.push(`/order-confirmation?orderId=${order.id}`);
-    } catch (err) {
+    } catch {
       toast.error('Something went wrong. Please try again.');
     } finally {
       setLoading(false);
@@ -112,7 +129,7 @@ export default function CheckoutPage() {
       <h1 className="text-2xl md:text-3xl font-bold text-gray-900 mb-8">{t.checkout.title}</h1>
 
       <form onSubmit={handleOrder} className="grid md:grid-cols-2 gap-8">
-        {/* Left: Shipping */}
+        {/* Left: Shipping + Gift */}
         <div className="space-y-6">
           <div className="card p-6">
             <h2 className="text-lg font-bold text-gray-900 mb-4">📦 {t.checkout.shipping}</h2>
@@ -180,18 +197,19 @@ export default function CheckoutPage() {
             </div>
           </div>
 
-          {/* Payment section */}
+          {/* Gift Options */}
+          <GiftOptions value={giftData} onChange={setGiftData} errors={giftErrors} />
+
+          {/* Payment */}
           <div className="card p-6">
             <h2 className="text-lg font-bold text-gray-900 mb-4">💳 {t.checkout.payment}</h2>
             <div className="bg-amber-50 border border-amber-200 rounded-lg p-4 text-sm text-amber-800">
               <strong>Demo mode:</strong> This is a demo checkout. No real charge will be made.
-              In production, add your Stripe keys to <code>.env</code> and integrate{' '}
-              <code>@stripe/react-stripe-js</code> for real card input.
             </div>
           </div>
         </div>
 
-        {/* Right: Order summary */}
+        {/* Right: Order Summary */}
         <div>
           <div className="card p-6 sticky top-24">
             <h2 className="text-lg font-bold text-gray-900 mb-4">{t.checkout.order_summary}</h2>
@@ -214,6 +232,17 @@ export default function CheckoutPage() {
                 </div>
               ))}
             </div>
+
+            {/* Gift summary in order sidebar */}
+            {giftData.isGift && (
+              <div className="bg-pink-50 border border-pink-100 rounded-lg p-3 mb-4 text-xs text-pink-700 space-y-0.5">
+                <p className="font-semibold">🎁 Gift Order</p>
+                {giftData.giftWrapping && giftData.wrappingStyle && (
+                  <p>Wrap: {giftData.wrappingStyle}{giftData.wrappingColor ? `, ${giftData.wrappingColor}` : ''}{giftData.ribbonColor ? ` + ${giftData.ribbonColor} ribbon` : ''}</p>
+                )}
+                {giftData.giftMessage && <p className="italic">"{giftData.giftMessage.slice(0, 50)}{giftData.giftMessage.length > 50 ? '…' : ''}"</p>}
+              </div>
+            )}
 
             <div className="border-t border-gray-100 pt-4 space-y-2 mb-6">
               <div className="flex justify-between text-sm text-gray-600">
