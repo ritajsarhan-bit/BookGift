@@ -66,7 +66,7 @@ export default function Footer() {
           <span>© {new Date().getFullYear()} BookGift. All rights reserved.</span>
           <div className="flex gap-4">
             <Link href="/about" className="hover:text-gray-300 transition-colors">About</Link>
-            <Link href="/login" className="hover:text-gray-300 transition-colors">Privacy</Link>
+            <Link href="/privacy" className="hover:text-gray-300 transition-colors">Privacy</Link>
             <span>Payments secured by Stripe</span>
           </div>
         </div>
@@ -74,3 +74,4 @@ export default function Footer() {
     </footer>
   );
 }
+
