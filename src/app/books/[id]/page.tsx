@@ -1,7 +1,5 @@
-/**
- * Individual book detail page — Server Component for SEO.
- * Shows full book info, reviews, and related books.
- */
+export const dynamic = 'force-dynamic';
+
 import { prisma } from '@/lib/prisma';
 import { notFound } from 'next/navigation';
 import type { Metadata } from 'next';

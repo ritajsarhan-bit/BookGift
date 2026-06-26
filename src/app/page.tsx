@@ -1,7 +1,5 @@
-/**
- * Homepage — Hero, Featured Books, Categories
- * This is a Server Component: data is fetched on the server, no loading spinner needed.
- */
+export const dynamic = 'force-dynamic';
+
 import { prisma } from '@/lib/prisma';
 import HeroSection from '@/components/home/HeroSection';
 import FeaturedBooks from '@/components/home/FeaturedBooks';
