@@ -116,6 +116,24 @@ export default function ChatBot() {
               </div>
             ))}
 
+            {/* Quick suggestion buttons shown only before user sends first message */}
+            {messages.length === 1 && !loading && (
+              <div className="flex flex-wrap gap-2 pt-1">
+                {(language === 'he'
+                  ? ['המלץ על ספר מתנה', 'ספרים לילדים', 'רומנים פופולריים']
+                  : ['Recommend a gift book', 'Books for kids', 'Popular fiction']
+                ).map((suggestion) => (
+                  <button
+                    key={suggestion}
+                    onClick={() => { setInput(suggestion); }}
+                    className="text-xs border border-blue-200 text-blue-700 rounded-full px-3 py-1 hover:bg-blue-50 transition-colors"
+                  >
+                    {suggestion}
+                  </button>
+                ))}
+              </div>
+            )}
+
             {loading && (
               <div className="flex justify-start">
                 <div className="bg-gray-100 px-4 py-3 rounded-2xl rounded-bl-sm">
