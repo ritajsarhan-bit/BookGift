@@ -74,10 +74,7 @@ export default function LoginPage() {
           </button>
         </form>
 
-        {/* Demo credentials hint */}
-        <div className="mt-4 p-3 bg-blue-50 rounded-lg text-xs text-blue-700">
-          <strong>Demo:</strong> user@example.com / user123 &nbsp;|&nbsp; Admin: admin@BookGift.com / admin123
-        </div>
+
 
         <p className="text-center text-sm text-gray-500 mt-6">
           {t.auth.no_account}{' '}
