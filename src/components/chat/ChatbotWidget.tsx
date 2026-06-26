@@ -1,11 +1,6 @@
 "use client";
 
-import { useState } from "react";
-
-// AI CHATBOT PLACEHOLDER
-// This is a non-functional UI shell. Wire it to an assistant endpoint later
-// (e.g. a /api/chat route backed by the Claude API). For now it echoes a
-// canned reply so the experience can be designed and reviewed.
+import { useState, useRef, useEffect } from "react";
 
 interface Message {
   id: number;
@@ -29,23 +24,53 @@ export function ChatbotWidget() {
   const [open, setOpen] = useState(false);
   const [messages, setMessages] = useState<Message[]>([greeting]);
   const [draft, setDraft] = useState("");
+  const [loading, setLoading] = useState(false);
+  const bottomRef = useRef<HTMLDivElement>(null);
 
-  function send(text: string) {
+  useEffect(() => {
+    bottomRef.current?.scrollIntoView({ behavior: "smooth" });
+  }, [messages]);
+
+  async function send(text: string) {
     const trimmed = text.trim();
-    if (!trimmed) return;
+    if (!trimmed || loading) return;
+
     const userMsg: Message = { id: Date.now(), role: "user", text: trimmed };
-    const botMsg: Message = {
-      id: Date.now() + 1,
-      role: "bot",
-      text: "Thanks! I'm just a placeholder for now — soon I'll suggest perfect books and gift wraps from our catalog. 📚",
-    };
-    setMessages((m) => [...m, userMsg, botMsg]);
+    setMessages((m) => [...m, userMsg]);
     setDraft("");
+    setLoading(true);
+
+    try {
+      const history = messages.map((m) => ({
+        role: m.role === "user" ? "user" : "assistant",
+        content: m.text,
+      }));
+
+      const res = await fetch("/api/chatbot", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ message: trimmed, history }),
+      });
+
+      const data = await res.json();
+      const botMsg: Message = {
+        id: Date.now() + 1,
+        role: "bot",
+        text: data.reply ?? "Sorry, I could not get a response.",
+      };
+      setMessages((m) => [...m, botMsg]);
+    } catch {
+      setMessages((m) => [
+        ...m,
+        { id: Date.now() + 1, role: "bot", text: "Something went wrong. Please try again." },
+      ]);
+    } finally {
+      setLoading(false);
+    }
   }
 
   return (
     <>
-      {/* Launcher */}
       <button
         onClick={() => setOpen((v) => !v)}
         className="fixed bottom-5 right-5 z-50 grid h-14 w-14 place-items-center rounded-full bg-ribbon text-white shadow-lift transition-transform hover:scale-105"
@@ -62,7 +87,6 @@ export function ChatbotWidget() {
         )}
       </button>
 
-      {/* Panel */}
       {open && (
         <div className="fixed bottom-24 right-5 z-50 flex h-[460px] w-[min(360px,calc(100vw-2.5rem))] flex-col overflow-hidden rounded-2xl bg-white shadow-lift ring-1 ring-ink/10">
           <div className="flex items-center gap-3 bg-ribbon px-4 py-3 text-white">
@@ -71,7 +95,7 @@ export function ChatbotWidget() {
             </span>
             <div>
               <p className="text-sm font-semibold">Margin · AI Assistant</p>
-              <p className="text-xs text-white/80">Placeholder · coming soon</p>
+              <p className="text-xs text-white/80">Powered by Claude AI</p>
             </div>
           </div>
 
@@ -79,9 +103,7 @@ export function ChatbotWidget() {
             {messages.map((m) => (
               <div
                 key={m.id}
-                className={
-                  m.role === "user" ? "flex justify-end" : "flex justify-start"
-                }
+                className={m.role === "user" ? "flex justify-end" : "flex justify-start"}
               >
                 <p
                   className={
@@ -95,7 +117,15 @@ export function ChatbotWidget() {
               </div>
             ))}
 
-            {messages.length === 1 && (
+            {loading && (
+              <div className="flex justify-start">
+                <p className="max-w-[85%] rounded-2xl rounded-bl-sm bg-white px-3.5 py-2 text-sm text-ink-soft shadow-sm ring-1 ring-ink/5">
+                  Thinking...
+                </p>
+              </div>
+            )}
+
+            {messages.length === 1 && !loading && (
               <div className="flex flex-wrap gap-2 pt-1">
                 {suggestions.map((s) => (
                   <button
@@ -108,24 +138,25 @@ export function ChatbotWidget() {
                 ))}
               </div>
             )}
+
+            <div ref={bottomRef} />
           </div>
 
           <form
-            onSubmit={(e) => {
-              e.preventDefault();
-              send(draft);
-            }}
+            onSubmit={(e) => { e.preventDefault(); send(draft); }}
             className="flex items-center gap-2 border-t border-ink/8 bg-white px-3 py-3"
           >
             <input
               value={draft}
               onChange={(e) => setDraft(e.target.value)}
-              placeholder="Ask for a recommendation…"
-              className="flex-1 rounded-full border border-ink/15 bg-paper px-3.5 py-2 text-sm text-ink placeholder:text-ink-muted focus:border-brand-400 focus:outline-none"
+              placeholder="Ask for a recommendation..."
+              disabled={loading}
+              className="flex-1 rounded-full border border-ink/15 bg-paper px-3.5 py-2 text-sm text-ink placeholder:text-ink-muted focus:border-brand-400 focus:outline-none disabled:opacity-50"
             />
             <button
               type="submit"
-              className="grid h-9 w-9 place-items-center rounded-full bg-brand-500 text-white transition-colors hover:bg-brand-600"
+              disabled={loading || !draft.trim()}
+              className="grid h-9 w-9 place-items-center rounded-full bg-brand-500 text-white transition-colors hover:bg-brand-600 disabled:opacity-50"
               aria-label="Send message"
             >
               <svg viewBox="0 0 24 24" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="2">
