@@ -45,9 +45,10 @@ export const authOptions: NextAuthOptions = {
         if (!credentials?.email || !credentials?.password) return null;
 
         try {
-          const rows = await prisma.$queryRaw`
-            SELECT id, email, name, password, role FROM public.users WHERE LOWER(email) = LOWER(${credentials.email}) LIMIT 1
-          ` as any[];
+          const email = credentials.email.toLowerCase().replace(/'/g, "''");
+          const rows = await prisma.$queryRawUnsafe(
+            `SELECT id, email, name, password, role FROM public.users WHERE LOWER(email) = '${email}' LIMIT 1`
+          ) as any[];
 
           console.log('Auth rows found:', rows.length);
           const user = rows[0];

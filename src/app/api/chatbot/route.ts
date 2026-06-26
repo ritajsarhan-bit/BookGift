@@ -14,10 +14,9 @@ export async function POST(req: NextRequest) {
     // Fetch the available books so the AI can recommend real ones
     let books: any[] = [];
     try {
-      books = await prisma.$queryRaw`
-        SELECT id, title, author, price, stock, category, language
-        FROM books ORDER BY created_at DESC LIMIT 50
-      ` as any[];
+      books = await prisma.$queryRawUnsafe(
+        `SELECT id, title, author, price, stock, category, language FROM books ORDER BY created_at DESC LIMIT 50`
+      ) as any[];
     } catch {
       books = [];
     }

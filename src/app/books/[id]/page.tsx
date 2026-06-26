@@ -11,11 +11,10 @@ interface Props {
 
 async function getBook(id: string) {
   try {
-    const books = await prisma.$queryRaw`
-      SELECT id, title, author, description, price, stock, category, language, image_url
-      FROM books WHERE id = ${id}::uuid
-      LIMIT 1
-    ` as any[];
+    const safeId = id.replace(/'/g, "''");
+    const books = await prisma.$queryRawUnsafe(
+      `SELECT id, title, author, description, price, stock, category, language, image_url FROM books WHERE id = '${safeId}'::uuid LIMIT 1`
+    ) as any[];
     return books[0] || null;
   } catch {
     return null;

@@ -6,12 +6,9 @@ import FeaturedBooks from '@/components/home/FeaturedBooks';
 async function getHomeData() {
   try {
     const { prisma } = await import('@/lib/prisma');
-    const rawBooks = await prisma.$queryRaw`
-      SELECT id, title, author, description, price, stock, category, language, image_url
-      FROM books
-      ORDER BY created_at DESC
-      LIMIT 8
-    ` as any[];
+    const rawBooks = await prisma.$queryRawUnsafe(
+      `SELECT id, title, author, description, price, stock, category, language, image_url FROM books ORDER BY created_at DESC LIMIT 8`
+    ) as any[];
 
     const featuredBooks = rawBooks.map((b: any) => ({
       id: b.id,
