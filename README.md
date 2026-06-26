@@ -51,7 +51,7 @@ npm run db:seed
 npm run dev
 ```
 
-Open your browser at: **http://localhost:3000**
+Open your browser at: **https://bookgift-production.up.railway.app/**
 
 ---
 
