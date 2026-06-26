@@ -44,21 +44,26 @@ export const authOptions: NextAuthOptions = {
       async authorize(credentials) {
         if (!credentials?.email || !credentials?.password) return null;
 
-        const user = await prisma.user.findUnique({
-          where: { email: credentials.email },
-        });
+        try {
+          const rows = await prisma.$queryRaw`
+            SELECT id, email, name, password, role FROM users WHERE email = ${credentials.email} LIMIT 1
+          ` as any[];
 
-        if (!user || !user.password) return null;
+          const user = rows[0];
+          if (!user || !user.password) return null;
 
-        const isValid = await bcrypt.compare(credentials.password, user.password);
-        if (!isValid) return null;
+          const isValid = await bcrypt.compare(credentials.password, user.password);
+          if (!isValid) return null;
 
-        return {
-          id: user.id,
-          email: user.email,
-          name: user.name,
-          role: user.role,
-        };
+          return {
+            id: user.id,
+            email: user.email,
+            name: user.name,
+            role: user.role,
+          };
+        } catch {
+          return null;
+        }
       },
     }),
   ],
