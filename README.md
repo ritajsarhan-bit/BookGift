@@ -1,4 +1,4 @@
-# 📚 BookGift - Full-Stack Online Bookstore
+# 📚 BookGift - Full-Stack Online Bookstore:
 
 A production-ready online bookstore with English & Hebrew support, AI chatbot, Stripe payments, and an admin dashboard.
 
