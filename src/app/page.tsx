@@ -1,16 +1,13 @@
 export const dynamic = 'force-dynamic';
 
-import { prisma } from '@/lib/prisma';
 import HeroSection from '@/components/home/HeroSection';
 import FeaturedBooks from '@/components/home/FeaturedBooks';
 import CategoryGrid from '@/components/home/CategoryGrid';
 
-export default async function HomePage() {
-  let featuredBooks: any[] = [];
-  let categories: any[] = [];
-
+async function getHomeData() {
   try {
-    [featuredBooks, categories] = await Promise.all([
+    const { prisma } = await import('@/lib/prisma');
+    const [featuredBooks, categories] = await Promise.all([
       prisma.book.findMany({
         where: { featured: true, published: true },
         include: { category: true },
@@ -22,9 +19,14 @@ export default async function HomePage() {
         orderBy: { name: 'asc' },
       }),
     ]);
-  } catch (err) {
-    console.error('Homepage DB error:', err);
+    return { featuredBooks, categories };
+  } catch {
+    return { featuredBooks: [], categories: [] };
   }
+}
+
+export default async function HomePage() {
+  const { featuredBooks, categories } = await getHomeData();
 
   return (
     <>
