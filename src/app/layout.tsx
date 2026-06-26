@@ -8,7 +8,7 @@ export const metadata: Metadata = {
     template: '%s | BookGift',
   },
   description:
-    'Discover thousands of books in English and Hebrew. Programming, fiction, science, children\'s books and more.',
+    'Gift the perfect book and discover thousands of titles in English and Hebrew. Programming, fiction, science, children\'s books and more.',
   keywords: ['books', 'online BookGift', 'ebooks', 'Hebrew books', 'programming books'],
   openGraph: {
     type: 'website',
@@ -28,3 +28,4 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     </html>
   );
 }
+
