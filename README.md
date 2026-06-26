@@ -2,7 +2,7 @@
 
 A production-ready online bookstore with English & Hebrew support, AI chatbot, Stripe payments, and an admin dashboard.
 
---
+---
 
 ## 🚀 Quick Start (Step-by-Step for Beginners)
 
