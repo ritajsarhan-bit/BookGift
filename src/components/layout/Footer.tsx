@@ -13,12 +13,13 @@ export default function Footer() {
           {/* Brand */}
           <div>
             <h3 className="text-white font-bold text-xl mb-3">📚 BookGift</h3>
-            <p className="text-sm text-gray-400 leading-relaxed">
-              Your online destination for books in English and Hebrew.
+            <p className="text-sm text-gray-400 leading-relaxed mb-3">
+              Gift the perfect book, beautifully wrapped. Books in English and Hebrew.
             </p>
+            <p className="text-xs text-gray-500">contact@bookgift.com</p>
           </div>
 
-          {/* Links */}
+          {/* Shop */}
           <div>
             <h4 className="text-white font-semibold mb-3">Shop</h4>
             <ul className="space-y-2 text-sm">
@@ -26,6 +27,7 @@ export default function Footer() {
               <li><Link href="/books?lang=he" className="hover:text-white transition-colors">Hebrew Books</Link></li>
               <li><Link href="/books?category=programming" className="hover:text-white transition-colors">Programming</Link></li>
               <li><Link href="/books?category=fiction" className="hover:text-white transition-colors">Fiction</Link></li>
+              <li><Link href="/about" className="hover:text-white transition-colors">About Us</Link></li>
             </ul>
           </div>
 
@@ -60,8 +62,13 @@ export default function Footer() {
           </div>
         </div>
 
-        <div className="border-t border-gray-800 pt-6 text-center text-xs text-gray-500">
-          © {new Date().getFullYear()} BookGift. All rights reserved. | Payments secured by Stripe.
+        <div className="border-t border-gray-800 pt-6 flex flex-col sm:flex-row items-center justify-between gap-2 text-xs text-gray-500">
+          <span>© {new Date().getFullYear()} BookGift. All rights reserved.</span>
+          <div className="flex gap-4">
+            <Link href="/about" className="hover:text-gray-300 transition-colors">About</Link>
+            <Link href="/login" className="hover:text-gray-300 transition-colors">Privacy</Link>
+            <span>Payments secured by Stripe</span>
+          </div>
         </div>
       </div>
     </footer>
