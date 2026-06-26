@@ -1,20 +1,20 @@
-import type { Metadata } from 'next';
+﻿import type { Metadata } from 'next';
 import './globals.css';
 import { Providers } from '@/components/Providers';
 
 export const metadata: Metadata = {
   title: {
-    default: 'BookStore – Your Online Library',
-    template: '%s | BookStore',
+    default: 'BookGift – Gift Books with Love',
+    template: '%s | BookGift',
   },
   description:
     'Discover thousands of books in English and Hebrew. Programming, fiction, science, children\'s books and more.',
-  keywords: ['books', 'online bookstore', 'ebooks', 'Hebrew books', 'programming books'],
+  keywords: ['books', 'online BookGift', 'ebooks', 'Hebrew books', 'programming books'],
   openGraph: {
     type: 'website',
-    title: 'BookStore',
-    description: 'Your online library in English and Hebrew',
-    siteName: 'BookStore',
+    title: 'BookGift',
+    description: 'Gift Books with Love in English and Hebrew',
+    siteName: 'BookGift',
   },
 };
 

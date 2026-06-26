@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
@@ -37,7 +37,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
       {/* Sidebar */}
       <aside className="w-56 bg-gray-900 text-gray-300 flex flex-col fixed h-full top-0 left-0 z-40">
         <div className="px-5 py-6 border-b border-gray-800">
-          <Link href="/" className="text-white font-bold text-lg">📚 BookStore</Link>
+          <Link href="/" className="text-white font-bold text-lg">📚 BookGift</Link>
           <p className="text-xs text-gray-500 mt-0.5">Admin Panel</p>
         </div>
         <nav className="flex-1 py-4">

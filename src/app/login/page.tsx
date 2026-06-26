@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import { useState } from 'react';
 import { signIn } from 'next-auth/react';
@@ -41,7 +41,7 @@ export default function LoginPage() {
         <div className="text-center mb-8">
           <span className="text-5xl">📚</span>
           <h1 className="text-2xl font-bold text-gray-900 mt-4">{t.auth.login_title}</h1>
-          <p className="text-gray-500 mt-1">Welcome back to BookStore</p>
+          <p className="text-gray-500 mt-1">Welcome back to BookGift</p>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-4">
@@ -76,7 +76,7 @@ export default function LoginPage() {
 
         {/* Demo credentials hint */}
         <div className="mt-4 p-3 bg-blue-50 rounded-lg text-xs text-blue-700">
-          <strong>Demo:</strong> user@example.com / user123 &nbsp;|&nbsp; Admin: admin@bookstore.com / admin123
+          <strong>Demo:</strong> user@example.com / user123 &nbsp;|&nbsp; Admin: admin@BookGift.com / admin123
         </div>
 
         <p className="text-center text-sm text-gray-500 mt-6">

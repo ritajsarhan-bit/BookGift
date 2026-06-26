@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import { useState } from 'react';
 import { signIn } from 'next-auth/react';
@@ -41,7 +41,7 @@ export default function RegisterPage() {
 
       // Auto sign-in after registration
       await signIn('credentials', { email: form.email, password: form.password, redirect: false });
-      toast.success('Account created! Welcome to BookStore!');
+      toast.success('Account created! Welcome to BookGift!');
       router.push('/');
       router.refresh();
     } finally {
@@ -55,7 +55,7 @@ export default function RegisterPage() {
         <div className="text-center mb-8">
           <span className="text-5xl">📚</span>
           <h1 className="text-2xl font-bold text-gray-900 mt-4">{t.auth.register_title}</h1>
-          <p className="text-gray-500 mt-1">Join BookStore today</p>
+          <p className="text-gray-500 mt-1">Join BookGift today</p>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-4">

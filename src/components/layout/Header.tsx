@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import Link from 'next/link';
 import { useSession, signOut } from 'next-auth/react';
@@ -24,7 +24,7 @@ export default function Header() {
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
           <Link href="/" className="flex items-center gap-2 font-bold text-2xl text-blue-800">
-            📚 BookStore
+            📚 BookGift
           </Link>
 
           {/* Desktop nav links */}

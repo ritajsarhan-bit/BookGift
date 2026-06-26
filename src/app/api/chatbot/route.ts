@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from 'next/server';
+﻿import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import Anthropic from '@anthropic-ai/sdk';
 
@@ -37,7 +37,7 @@ export async function POST(req: NextRequest) {
       )
       .join('\n');
 
-    const systemPrompt = `You are a helpful bookstore assistant for an online bookstore that sells books in English and Hebrew.
+    const systemPrompt = `You are a helpful BookGift assistant for an online BookGift that sells books in English and Hebrew.
 You should help customers find books, make recommendations, and answer questions about the store.
 
 Always be friendly, concise, and helpful. When recommending books, only recommend books from our actual catalog below.
