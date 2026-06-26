@@ -46,13 +46,18 @@ export const authOptions: NextAuthOptions = {
 
         try {
           const rows = await prisma.$queryRaw`
-            SELECT id, email, name, password, role FROM users WHERE email = ${credentials.email} LIMIT 1
+            SELECT id, email, name, password, role FROM public.users WHERE LOWER(email) = LOWER(${credentials.email}) LIMIT 1
           ` as any[];
 
+          console.log('Auth rows found:', rows.length);
           const user = rows[0];
-          if (!user || !user.password) return null;
+          if (!user || !user.password) {
+            console.log('No user or no password');
+            return null;
+          }
 
           const isValid = await bcrypt.compare(credentials.password, user.password);
+          console.log('Password valid:', isValid);
           if (!isValid) return null;
 
           return {
@@ -61,7 +66,8 @@ export const authOptions: NextAuthOptions = {
             name: user.name,
             role: user.role,
           };
-        } catch {
+        } catch (e: any) {
+          console.error('Auth error:', e?.message);
           return null;
         }
       },
