@@ -6,16 +6,18 @@ import FeaturedBooks from '@/components/home/FeaturedBooks';
 async function getHomeData() {
   try {
     const { prisma } = await import('@/lib/prisma');
-    const rawBooks = await (prisma as any).book.findMany({
-      orderBy: { created_at: 'desc' },
-      take: 8,
-    });
+    const rawBooks = await prisma.$queryRaw`
+      SELECT id, title, author, description, price, stock, category, language, image_url
+      FROM books
+      ORDER BY created_at DESC
+      LIMIT 8
+    ` as any[];
 
     const featuredBooks = rawBooks.map((b: any) => ({
       id: b.id,
       title: b.title,
       author: b.author,
-      price: b.price,
+      price: Number(b.price),
       discountPrice: null,
       coverImage: b.image_url || null,
       stock: b.stock ?? 10,
@@ -26,8 +28,8 @@ async function getHomeData() {
     }));
 
     return { featuredBooks };
-  } catch (e) {
-    console.error('Homepage error:', e);
+  } catch (e: any) {
+    console.error('Homepage error:', e?.message);
     return { featuredBooks: [] };
   }
 }
