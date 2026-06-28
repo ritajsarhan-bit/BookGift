@@ -208,7 +208,7 @@ export function flatten<T>(arr: T[][]): T[] {
 
 /** Remove duplicates from an array */
 export function unique<T>(arr: T[]): T[] {
-  return [...new Set(arr)];
+  return Array.from(new Set(arr));
 }
 
 /** Sum an array of numbers */
